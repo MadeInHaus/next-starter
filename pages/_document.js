@@ -9,6 +9,7 @@ class MyDocument extends Document {
                 </Head>
                 <body>
                     <Main />
+                    <div id="__gridoverlay_portal__" />
                     <NextScript />
                 </body>
             </Html>

@@ -20,6 +20,7 @@ import { useTransitionState } from 'hooks/usePageTransitionStore';
 import NextHead from 'next/head';
 
 import PageTransition from 'components/ui/PageTransition';
+import GridOverlay from 'components/ui/GridOverlay';
 
 import styles from 'styles/modules/app.module.scss';
 
@@ -55,6 +56,7 @@ function App({ Component, pageProps }) {
             <PageTransition className={transitionClass}>
                 <Component {...pageProps} key={removeHash(router.asPath)} />
             </PageTransition>
+            <GridOverlay />
         </>
     );
 }
