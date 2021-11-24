@@ -1,0 +1,28 @@
+// Font definitions
+// -------------------------
+
+@mixin haasDisplayBold {
+    font-family: neue-haas-grotesk-display, sans-serif;
+    font-weight: 700;
+}
+
+@mixin haasRoman {
+    font-family: neue-haas-grotesk-text, sans-serif;
+    font-weight: 400;
+}
+
+@mixin haasMedium {
+    font-family: neue-haas-grotesk-text, sans-serif;
+    font-weight: 500;
+}
+
+@mixin haasBold {
+    font-family: neue-haas-grotesk-text, sans-serif;
+    font-weight: 700;
+}
+
+@mixin interstate {
+    font-family: interstate-mono, monospace;
+    font-weight: 400;
+    letter-spacing: -0.1rem;
+}

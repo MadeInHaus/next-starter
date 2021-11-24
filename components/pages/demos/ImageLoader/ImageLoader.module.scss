@@ -1,0 +1,21 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.image {
+    display: block;
+    opacity: 0;
+
+    &.loaded {
+        animation: fadeIn 1s linear forwards;
+    }
+}
+
+@keyframes fadeIn {
+    100% {
+        opacity: 1;
+    }
+}

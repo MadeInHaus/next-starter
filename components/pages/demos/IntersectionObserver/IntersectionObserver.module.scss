@@ -1,0 +1,30 @@
+.root {
+    padding: 2rem;
+}
+
+.button {
+    padding: 0.5rem 1rem;
+    background-color: #f4f4f4;
+    border: 1px solid #666;
+    border-radius: 0.5rem;
+
+    &:hover {
+        background-color: #fff;
+    }
+}
+
+.header {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.intersectingElement {
+    width: 20rem;
+    height: 20rem;
+    margin-top: 200rem;
+    background-color: red;
+}

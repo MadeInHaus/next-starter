@@ -1,0 +1,62 @@
+{
+    "rules": {
+        "block-no-empty": null,
+        "color-no-hex": null,
+        "color-no-invalid-hex": true,
+        "at-rule-no-vendor-prefix": true,
+        "declaration-colon-space-after": "always",
+        "max-empty-lines": 1,
+        "max-nesting-depth": 4,
+        "rule-empty-line-before": [
+            "always",
+            {
+                "except": ["first-nested"],
+                "ignore": ["after-comment"]
+            }
+        ],
+        "comment-empty-line-before": [
+            "always",
+            {
+                "ignore": ["stylelint-commands", "after-comment"]
+            }
+        ],
+        "unit-case": "lower",
+        "unit-allowed-list": [
+            "em",
+            "ex",
+            "cap",
+            "ch",
+            "ic",
+            "rem",
+            "lh",
+            "rlh",
+            "vw",
+            "vh",
+            "vi",
+            "vb",
+            "vmin",
+            "vmax",
+            "cm",
+            "mm",
+            "Q",
+            "in",
+            "pc",
+            "pt",
+            "px",
+            "deg",
+            "grad",
+            "rad",
+            "turn",
+            "s",
+            "ms",
+            "Hz",
+            "kHz",
+            "dpi",
+            "dpcm",
+            "dppx",
+            "x",
+            "%",
+            "fr"
+        ]
+    }
+}

@@ -1,0 +1,52 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    font-size: 62.5%;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    padding: 0;
+    margin: 0;
+    font-weight: normal;
+}
+
+a {
+    color: inherit;
+}
+
+ul,
+ol {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+button {
+    padding: 0;
+    border: none;
+    color: currentColor;
+    background-color: inherit;
+    user-select: none;
+    cursor: pointer;
+}

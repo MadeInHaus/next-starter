@@ -1,0 +1,26 @@
+{
+  "name": "haus-next-starter",
+  "description": "A skeleton Next.js app to quickly get started.",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "12.0.4",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "sass": "1.43.4",
+    "webfontloader": "1.6.28",
+    "zustand": "3.6.5"
+  },
+  "devDependencies": {
+    "@madeinhaus/prettier-config": "1.1.0",
+    "eslint": "7.32.0",
+    "eslint-config-next": "12.0.4",
+    "prettier": "2.4.1",
+    "stylelint": "14.1.0"
+  }
+}
