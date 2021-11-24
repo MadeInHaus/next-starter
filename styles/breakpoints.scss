@@ -1,6 +1,13 @@
-$medium: 640px;
+$small: 375px;
+$medium: 768px;
 $large: 1280px;
 $xlarge: 1920px;
+
+@mixin small {
+    @media (min-width: $small) {
+        @content;
+    }
+}
 
 @mixin medium {
     @media (min-width: $medium) {
@@ -16,6 +23,12 @@ $xlarge: 1920px;
 
 @mixin xlarge {
     @media (min-width: $xlarge) {
+        @content;
+    }
+}
+
+@mixin tinyOnly {
+    @media (max-width: $small - 1) {
         @content;
     }
 }

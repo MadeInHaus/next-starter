@@ -1,0 +1,14 @@
+@import 'styles/breakpoints';
+
+:root {
+}
+
+@include medium {
+    :root {
+    }
+}
+
+@include large {
+    :root {
+    }
+}

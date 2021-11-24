@@ -1,22 +1,45 @@
-html,
-body {
-    padding: 0;
-    margin: 0;
-}
-
 html {
     font-size: 62.5%;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    box-sizing: border-box;
+}
+
+html,
+body,
+#__next {
+    height: 100%;
+}
+
+#__next {
+  isolation: isolate;
+}
+
+* {
+    margin: 0;
 }
 
 *,
-*:before,
-*:after {
-    box-sizing: inherit;
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
 }
 
 h1,
@@ -26,9 +49,8 @@ h4,
 h5,
 h6,
 p {
-    padding: 0;
-    margin: 0;
     font-weight: normal;
+    overflow-wrap: break-word;
 }
 
 a {
@@ -38,7 +60,6 @@ a {
 ul,
 ol {
     padding: 0;
-    margin: 0;
     list-style-type: none;
 }
 

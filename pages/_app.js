@@ -1,5 +1,12 @@
-import 'styles/globals.scss';
-import 'styles/misc.scss';
+// Resets, global styles
+import 'styles/global/reset.scss';
+import 'styles/global/theme.scss';
+
+// Global CSS variable definitions
+import 'styles/global/grid.scss';
+import 'styles/global/colors.scss';
+import 'styles/global/animations.scss';
+import 'styles/global/misc.scss';
 
 import cx from 'classnames';
 import { useRouter } from 'next/router';
