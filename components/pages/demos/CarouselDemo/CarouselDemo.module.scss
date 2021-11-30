@@ -1,0 +1,61 @@
+@import 'styles/breakpoints';
+@import 'styles/fonts';
+
+.root {
+    color: black;
+}
+
+.section {
+    &:not(:first-child) {
+        margin-top: 2rem;
+    }
+}
+
+.headline {
+    padding: 2rem;
+}
+
+.carousel1 {
+    --carousel-gap: var(--grid-gap);
+    --carousel-snap-position: var(--grid-margin);
+    --carousel-item-width: calc(
+        var(--grid-col-width) * 4 + var(--grid-gap) * 3
+    );
+}
+
+.carousel1Item {
+    position: relative;
+    width: var(--carousel-item-width);
+    padding-bottom: 65%;
+    height: 0;
+}
+
+.carousel1Image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel2 {
+    --carousel-gap: calc(var(--grid-gap) * 3);
+    --carousel-snap-position: 50%;
+}
+
+.carousel2Item {
+    @include haasBold;
+    font-size: 4.6rem;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    @include medium {
+        font-size: 6.6rem;
+    }
+    @include large {
+        font-size: 11.2rem;
+    }
+    @include xlarge {
+        font-size: 13.2rem;
+    }
+}
