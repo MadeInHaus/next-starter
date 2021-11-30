@@ -20,9 +20,25 @@ const CarouselDemo = ({ className }) => {
                 </Text>
                 <Carousel infinite align="start" className={styles.carousel1}>
                     {mappable(8).map(i => (
-                        <div className={styles.carousel1Item} key={i}>
+                        <div className={styles.itemKittens} key={i}>
                             <img
-                                className={styles.carousel1Image}
+                                className={styles.imageKittens}
+                                src={`/assets/images/kitten/kitten-0${i}.jpg`}
+                                alt=""
+                            />
+                        </div>
+                    ))}
+                </Carousel>
+            </section>
+            <section className={styles.section}>
+                <Text as="h1" className={styles.headline}>
+                    Finite Carousel, fixed width items, left aligned
+                </Text>
+                <Carousel className={styles.carousel2}>
+                    {mappable(8).map(i => (
+                        <div className={styles.itemKittens} key={i}>
+                            <img
+                                className={styles.imageKittens}
                                 src={`/assets/images/kitten/kitten-0${i}.jpg`}
                                 alt=""
                             />
@@ -34,9 +50,9 @@ const CarouselDemo = ({ className }) => {
                 <Text as="h1" className={styles.headline}>
                     Infinite Carousel, variable width items, centered
                 </Text>
-                <Carousel infinite align="center" className={styles.carousel2}>
+                <Carousel infinite align="center" className={styles.carousel3}>
                     {lorem.split(' ').map((word, i) => (
-                        <div className={styles.carousel2Item} key={i}>
+                        <div className={styles.itemText} key={i}>
                             {word}
                         </div>
                     ))}

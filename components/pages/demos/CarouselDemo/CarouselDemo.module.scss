@@ -21,34 +21,48 @@
     --carousel-item-width: calc(
         var(--grid-col-width) * 4 + var(--grid-gap) * 3
     );
-}
-
-.carousel1Item {
-    position: relative;
-    width: var(--carousel-item-width);
-    padding-bottom: 65%;
-    height: 0;
-}
-
-.carousel1Image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    --carousel-margin: var(--grid-margin);
+    --carousel-margin-left: var(--grid-margin);
+    --carousel-margin-right: var(--grid-margin);
 }
 
 .carousel2 {
+    --carousel-gap: var(--grid-gap);
+    --carousel-snap-position: var(--grid-margin);
+    --carousel-item-width: calc(
+        var(--grid-col-width) * 4 + var(--grid-gap) * 3
+    );
+    --carousel-margin: var(--grid-margin);
+    --carousel-margin-left: var(--grid-margin);
+    --carousel-margin-right: var(--grid-margin);
+}
+
+.carousel3 {
     --carousel-gap: calc(var(--grid-gap) * 3);
     --carousel-snap-position: 50%;
 }
 
-.carousel2Item {
+.itemKittens {
+    position: relative;
+    width: var(--carousel-item-width);
+    padding-bottom: 65%;
+    height: 0;
+
+    .imageKittens {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.itemText {
     @include haasBold;
     font-size: 4.6rem;
     letter-spacing: -0.01em;
-    line-height: 0.95;
+    line-height: 1.2;
     @include medium {
         font-size: 6.6rem;
     }

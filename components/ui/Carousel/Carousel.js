@@ -26,6 +26,8 @@ const Carousel = ({
     const carouselWidth = useRef();
     const gap = useRef();
     const snapPos = useRef();
+    const snapPosStart = useRef();
+    const snapPosEnd = useRef();
     const itemWidth = useRef();
     const itemWidths = useRef();
     const visibleItems = useRef();
@@ -110,6 +112,7 @@ const Carousel = ({
 
     const positionRight = useCallback(
         (index, x1) => {
+            if (!infinite && index === 0) return;
             const width = getItemWidth(index);
             const x2 = x1 + width;
             position(index, x1, x2);
@@ -120,11 +123,12 @@ const Carousel = ({
                 );
             }
         },
-        [items, position, getItemWidth]
+        [items, infinite, position, getItemWidth]
     );
 
     const positionLeft = useCallback(
         (index, x2) => {
+            if (!infinite && index === items.length - 1) return;
             const width = getItemWidth(index);
             const x1 = x2 - width;
             position(index, x1, x2);
@@ -132,7 +136,7 @@ const Carousel = ({
                 positionLeft(modulo(index - 1, items.length), x1 - gap.current);
             }
         },
-        [items, position, getItemWidth]
+        [items, infinite, position, getItemWidth]
     );
 
     const positionItems = useCallback(() => {
@@ -153,16 +157,12 @@ const Carousel = ({
                 container.current.childNodes[index].style.transform = '';
             }
         });
-        if (carouselWidth.current === 0) {
-            carouselWidth.current = getCarouselWidth();
-        }
     }, [
         items,
         position,
         positionLeft,
         positionRight,
         getActiveItemPosition,
-        getCarouselWidth,
         activeItemIndex,
     ]);
 
@@ -171,11 +171,19 @@ const Carousel = ({
             // Get pixel values from CSS custom properties:
             // --carousel-gap
             // --carousel-snap-position
+            // --carousel-snap-position-start
+            // --carousel-snap-position-end
             // --carousel-item-width
             const values = getCSSValues(container.current);
             gap.current = isUndef(values.gap) ? 0 : values.gap;
-            snapPos.current = isUndef(values.snap) ? 0 : values.snap;
             itemWidth.current = isUndef(values.width) ? 0 : values.width;
+            snapPos.current = isUndef(values.snap) ? 0 : values.snap;
+            snapPosStart.current = isUndef(values.snapStart)
+                ? snapPos.current
+                : values.snapStart;
+            snapPosEnd.current = isUndef(values.snapEnd)
+                ? snapPos.current
+                : values.snapEnd;
             // Initialize some other refs:
             const { width } = container.current.getBoundingClientRect();
             containerWidth.current = width;
@@ -185,11 +193,11 @@ const Carousel = ({
                 // Initial positioning
                 positionItems();
             } catch (e) {
-                // This is an infinite carousel and it doesn't have enough
-                // items to fill the entire container:
+                // This is an infinite carousel and it doesn't have
+                // enough items to fill the entire container:
                 // Duplicate children until we have enough items.
-                const dupeCount = items.length / React.Children.count(children);
-                const dupes = mappable(dupeCount + 1).map(() => children);
+                const count = items.length / React.Children.count(children);
+                const dupes = mappable(count + 1).map(() => children);
                 setItems(React.Children.map(dupes, CarouselItem));
             }
         };
