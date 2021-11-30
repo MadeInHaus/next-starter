@@ -16,8 +16,6 @@ const Landing = () => {
             <Head
                 title="HAUS Next.js Starter"
                 description="A skeleton Next.js app to quickly get started."
-                url=""
-                image=""
             />
             <ul>
                 <li>

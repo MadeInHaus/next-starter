@@ -1,3 +1,8 @@
+// Real modulo
+export function modulo(a, b) {
+    return ((a % b) + b) % b;
+}
+
 export function mappable(size) {
     return new Array(size).fill(0).map((_, i) => i);
 }
