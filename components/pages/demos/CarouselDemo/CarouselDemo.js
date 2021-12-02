@@ -18,12 +18,13 @@ const CarouselDemo = ({ className }) => {
                 <Text as="h1" className={styles.headline}>
                     Infinite Carousel, fixed width items, left aligned
                 </Text>
-                <Carousel infinite align="start" className={styles.carousel1}>
+                <Carousel infinite className={styles.carousel1}>
                     {mappable(8).map(i => (
                         <div className={styles.itemKittens} key={i}>
                             <img
                                 className={styles.imageKittens}
                                 src={`/assets/images/kitten/kitten-0${i}.jpg`}
+                                draggable="false"
                                 alt=""
                             />
                         </div>
@@ -40,6 +41,7 @@ const CarouselDemo = ({ className }) => {
                             <img
                                 className={styles.imageKittens}
                                 src={`/assets/images/kitten/kitten-0${i}.jpg`}
+                                draggable="false"
                                 alt=""
                             />
                         </div>

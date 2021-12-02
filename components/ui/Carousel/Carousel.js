@@ -41,7 +41,7 @@ const Carousel = ({
             const node = container.current.childNodes[index];
             const { width } = node.getBoundingClientRect();
             itemWidths.current.set(index, width);
-            console.log(`getItemWidth ${index} ${width}`);
+            // console.log(`getItemWidth ${index} ${width}`);
         }
         return itemWidths.current.get(index);
     }, []);
@@ -208,8 +208,74 @@ const Carousel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [items, positionItems]);
 
+    const dragX = useRef();
+    const dragStart = useRef();
+    const dragLock = useRef();
+    const dragRegister = useRef();
+
+    const dragEnd = () => {
+        dragRegister.current.forEach(val => console.log(val));
+    };
+
+    const addPointerEvents = () => {
+        window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('pointercancel', handlePointerCancel);
+        window.addEventListener('pointermove', handlePointerMove);
+        container.current.addEventListener('touchmove', handleTouchMove);
+    };
+
+    const removePointerEvents = () => {
+        window.removeEventListener('pointerup', handlePointerUp);
+        window.removeEventListener('pointercancel', handlePointerCancel);
+        window.removeEventListener('pointermove', handlePointerMove);
+        container.current.removeEventListener('touchmove', handleTouchMove);
+    };
+
+    const handlePointerDown = event => {
+        addPointerEvents();
+        container.current.setPointerCapture(event.pointerId);
+        dragStart.current = dragX.current = event.screenX;
+        dragRegister.current = [];
+        dragLock.current = false;
+    };
+
+    const handlePointerUp = () => {
+        removePointerEvents();
+        dragEnd();
+    };
+
+    const handlePointerCancel = () => {
+        removePointerEvents();
+        dragEnd();
+    };
+
+    const handlePointerMove = event => {
+        const distTotal = Math.abs(event.screenX - dragStart.current);
+        if (!dragLock.current && distTotal > 20) {
+            dragLock.current = true;
+        }
+        const t = performance.now();
+        const x = event.screenX;
+        if (dragRegister.current.length) {
+            const last = dragRegister.current[dragRegister.current.length - 1];
+            dragRegister.current.push({ t, x, dt: t - last.t, dx: x - last.x });
+        } else {
+            dragRegister.current.push({ t, x });
+        }
+    };
+
+    const handleTouchMove = event => {
+        if (dragLock.current) {
+            event.preventDefault();
+        }
+    };
+
     return (
-        <div ref={container} className={cx(styles.root, className)}>
+        <div
+            ref={container}
+            onPointerDown={handlePointerDown}
+            className={cx(styles.root, className)}
+        >
             {items}
         </div>
     );
