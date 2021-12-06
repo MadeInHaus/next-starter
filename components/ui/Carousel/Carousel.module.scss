@@ -5,7 +5,12 @@
     .item {
         grid-area: 1 / -1;
         width: fit-content;
-        transform: translate3d(-1000vw, 0, 0);
+        will-change: transform;
+        transform: translate3d(-200%, 0, 0);
         user-select: none;
+
+        img {
+            pointer-events: none;
+        }
     }
 }

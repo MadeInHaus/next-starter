@@ -12,30 +12,40 @@
 }
 
 .headline {
-    padding: 2rem;
+    grid-column: 1 / -1;
+    padding: 2rem 0;
 }
 
-.carousel1 {
+.carouselText {
+    --carousel-gap: 0.5ch;
+    --carousel-snap-position: 50%;
+    --carousel-autoscroll: -0.1;
+
+    @include haasBold;
+    font-size: 4.6rem;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    @include medium {
+        font-size: 8rem;
+    }
+    @include large {
+        font-size: 13rem;
+    }
+    @include xlarge {
+        font-size: 17rem;
+    }
+}
+
+.carouselKittens {
     --carousel-gap: var(--grid-gap);
     --carousel-snap-position: var(--grid-margin);
     --carousel-item-width: var(--kitten-item-width);
     --carousel-autoscroll: 0;
-    --carousel-disabled: 1;
+    --carousel-disabled: 0;
 
     @include large {
         --carousel-disabled: 0;
     }
-}
-
-.carousel2 {
-    --carousel-gap: var(--grid-gap);
-    --carousel-snap-position: var(--grid-margin);
-    --carousel-item-width: var(--kitten-item-width);
-}
-
-.carousel3 {
-    --carousel-gap: calc(var(--grid-gap) * 3);
-    --carousel-snap-position: 50%;
 }
 
 .itemKittens {
@@ -51,21 +61,16 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        opacity: 0;
+
+        &.loaded {
+            animation: fadeIn 1s linear forwards;
+        }
     }
 }
 
-.itemText {
-    @include haasBold;
-    font-size: 4.6rem;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
-    @include medium {
-        font-size: 6.6rem;
-    }
-    @include large {
-        font-size: 11.2rem;
-    }
-    @include xlarge {
-        font-size: 13.2rem;
+@keyframes fadeIn {
+    100% {
+        opacity: 1;
     }
 }
