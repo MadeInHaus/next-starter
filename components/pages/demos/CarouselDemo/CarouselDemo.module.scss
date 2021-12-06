@@ -2,7 +2,7 @@
 @import 'styles/fonts';
 
 .root {
-    color: black;
+    --kitten-item-width: calc(var(--grid-col-width) * 4 + var(--grid-gap) * 3);
 }
 
 .section {
@@ -18,23 +18,19 @@
 .carousel1 {
     --carousel-gap: var(--grid-gap);
     --carousel-snap-position: var(--grid-margin);
-    --carousel-item-width: calc(
-        var(--grid-col-width) * 4 + var(--grid-gap) * 3
-    );
-    --carousel-margin: var(--grid-margin);
-    --carousel-margin-left: var(--grid-margin);
-    --carousel-margin-right: var(--grid-margin);
+    --carousel-item-width: var(--kitten-item-width);
+    --carousel-autoscroll: 0;
+    --carousel-disabled: 1;
+
+    @include large {
+        --carousel-disabled: 0;
+    }
 }
 
 .carousel2 {
     --carousel-gap: var(--grid-gap);
     --carousel-snap-position: var(--grid-margin);
-    --carousel-item-width: calc(
-        var(--grid-col-width) * 4 + var(--grid-gap) * 3
-    );
-    --carousel-margin: var(--grid-margin);
-    --carousel-margin-left: var(--grid-margin);
-    --carousel-margin-right: var(--grid-margin);
+    --carousel-item-width: var(--kitten-item-width);
 }
 
 .carousel3 {
@@ -44,7 +40,7 @@
 
 .itemKittens {
     position: relative;
-    width: var(--carousel-item-width);
+    width: var(--kitten-item-width);
     padding-bottom: 65%;
     height: 0;
 

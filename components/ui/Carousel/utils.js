@@ -1,4 +1,4 @@
-export const isUndef = v => isNaN(v) || typeof v === 'undefined';
+const isUndef = v => isNaN(v) || typeof v === 'undefined';
 
 export function getCSSValues(container) {
     const GAP = '--carousel-gap';
@@ -6,6 +6,8 @@ export function getCSSValues(container) {
     const SNAPSTART = '--carousel-snap-position-start';
     const SNAPEND = '--carousel-snap-position-end';
     const WIDTH = '--carousel-item-width';
+    const SCROLL = '--carousel-autoscroll';
+    const DISABLED = '--carousel-disabled';
     const dummy = document.createElement('div');
     const styles = [
         `padding-left: var(${GAP})`,
@@ -27,6 +29,8 @@ export function getCSSValues(container) {
     const snapStart = parseFloat(computed.getPropertyValue('margin-left'));
     const snapEnd = parseFloat(computed.getPropertyValue('margin-right'));
     const width = parseFloat(computed.getPropertyValue('height'));
+    const autoScroll = parseFloat(computed.getPropertyValue(SCROLL)) || 0;
+    const disabled = parseInt(computed.getPropertyValue(DISABLED), 10) ? 1 : 0;
     container.removeChild(dummy);
     return {
         gap: hasGap && !isUndef(gap) ? gap : undefined,
@@ -34,5 +38,23 @@ export function getCSSValues(container) {
         snapStart: hasSnapStart && !isUndef(snapStart) ? snapStart : undefined,
         snapEnd: hasSnapEnd && !isUndef(snapEnd) ? snapEnd : undefined,
         width: hasWidth && !isUndef(width) ? width : undefined,
+        autoScroll,
+        disabled,
     };
+}
+
+export function sign(value) {
+    return value < 0 ? -1 : 1;
+}
+
+export function clamp(value, bound1, bound2) {
+    const from = Math.min(bound1, bound2);
+    const to = Math.max(bound1, bound2);
+    return Math.max(Math.min(value, to), from);
+}
+
+export function hermite(time, from = 0, to = 1, timeStart = 0, timeEnd = 1) {
+    time = clamp(time, timeStart, timeEnd);
+    const t = (time - timeStart) / (timeEnd - timeStart);
+    return (-2 * t * t * t + 3 * t * t) * (to - from) + from;
 }
