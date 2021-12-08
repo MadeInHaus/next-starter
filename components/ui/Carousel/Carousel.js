@@ -2,8 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
-import { modulo, mappable, last } from 'utils';
-import { getCSSValues, hermite, sign } from './utils';
+import { getCSSValues, hermite, sign, modulo, mappable, last } from './utils';
 
 import styles from './Carousel.module.scss';
 
@@ -11,7 +10,7 @@ const CarouselItem = item => <div className={styles.item}>{item}</div>;
 
 const Carousel = ({
     infinite,
-    snap,
+    // snap,
     align,
     activeItemIndex,
     children,
