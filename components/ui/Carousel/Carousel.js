@@ -12,6 +12,7 @@ const Carousel = ({
     infinite,
     // snap,
     align,
+    damping,
     activeItemIndex,
     children,
     className,
@@ -144,6 +145,7 @@ const Carousel = ({
     );
 
     const positionItems = useCallback(() => {
+        if (!container.current) return;
         if (infinite) {
             const carouselWidth = getCarouselWidth();
             if (carouselWidth > 0) {
@@ -283,38 +285,14 @@ const Carousel = ({
     };
 
     const dragThrow = (v0, t0) => {
-        if (Math.abs(v0) > 0.2) {
-            // Let the duration be 1500ms for v0 = 0 and 3000ms for v0 = 15
-            // (lerped for velocities inbetween)
-            const duration = 1500 + ((3000 - 1500) * Math.abs(v0)) / (15 - 0.2);
-            // Find a suitable damping factor k
-            let lower = 0.2;
-            let upper = 0.6;
-            let i = 0;
-            let dx;
-            let k5;
-            do {
-                const k = (upper - lower) / 2 + lower;
-                k5 = Math.pow(k, 5);
-                const exp1 = Math.exp(-k5 * (duration - 16));
-                const exp2 = Math.exp(-k5 * duration);
-                dx = (exp1 - exp2) / k5;
-                if (dx < 0.01) upper = k;
-                if (dx > 0.0101) lower = k;
-            } while ((dx < 0.01 || dx > 0.0101) && i++ < 20);
+        if (Math.abs(v0) > 0.2 && damping > 0) {
             // Throw it!
-            animateThrow(v0, t0, k5, duration);
+            animateThrow(v0, t0);
         } else {
+            // This was not a throw.
+            // Start auto-scroll, if needed.
             animateAutoScroll();
-            console.log(`v0 = ${v0}`);
         }
-        // 800
-        // 400
-        // 0
-        // -400
-        // -800
-
-        // 380 + 20
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -370,11 +348,21 @@ const Carousel = ({
         [infinite, positionItems]
     );
 
+    const animateThrowSnap = useCallback(
+        v0 => {
+            const k = damping;
+            const duration = -k * Math.log(6 / (1000 * Math.abs(v0)));
+            const distance = v0 * k * (1 - Math.exp(-duration / k));
+            return { k, duration, distance };
+        },
+        [damping]
+    );
+
     const animateThrow = useCallback(
-        (v0, t0, k, duration) => {
-            const targetDist = v0 / k - (v0 * Math.exp(-k * duration)) / k;
+        (v0, t0) => {
+            const { k, duration, distance } = animateThrowSnap(v0);
             const startPos = offset.current;
-            const endPos = startPos + targetDist;
+            const endPos = startPos + distance;
             if (sign(v0) !== sign(autoScroll.current)) {
                 // Reverse auto-scroll direction if it goes in the
                 // opposite direction of the throw.
@@ -383,40 +371,44 @@ const Carousel = ({
             const loop = () => {
                 const currentTime = performance.now();
                 const elapsedTime = currentTime - t0;
-                const exp = Math.exp(-k * elapsedTime);
-                const dist = (v0 * (1 - exp)) / k;
-                const v = v0 * exp;
+                const exp = Math.exp(-elapsedTime / k);
+                const d = v0 * k * (1 - exp);
                 if (infinite && autoScroll.current !== 0) {
                     // If auto-scroll is enabled, and the velocity of the
                     // throw gets smaller than the auto-scroll velocity,
                     // auto-scroll takes over.
+                    const v = v0 * exp;
                     if (Math.abs(v) <= Math.abs(autoScroll.current)) {
                         animateAutoScroll(v, 1000);
                         return;
                     }
                 }
-                // Exit condition: We're either sufficiently near the target
-                // distance, or we're over time.
-                const isNearTarget = Math.abs(targetDist - dist) < 0.1;
-                if (isNearTarget || elapsedTime >= duration) {
+                // Exit condition:
+                // We're either sufficiently near the target,
+                // or we're out of time (the latter being a fail-safe).
+                const isNearTarget = Math.abs(distance - d) < 0.1;
+                const isOutOfTime = elapsedTime >= duration;
+                if (isNearTarget || isOutOfTime) {
                     offset.current = endPos;
                     positionItems();
                     animateAutoScroll();
                     // console.log(
                     //     'done',
-                    //     targetDist - dist,
+                    //     v0,
+                    //     distance,
+                    //     distance - d,
                     //     elapsedTime,
                     //     offset.current
                     // );
                 } else {
                     rafThrow.current = requestAnimationFrame(loop);
-                    offset.current = startPos + dist;
+                    offset.current = startPos + d;
                     positionItems();
                 }
             };
             loop();
         },
-        [infinite, positionItems, animateAutoScroll]
+        [infinite, positionItems, animateAutoScroll, animateThrowSnap]
     );
 
     ///////////////////////////////////////////////////////////////////////////
@@ -505,6 +497,7 @@ Carousel.propTypes = {
     infinite: PropTypes.bool,
     snap: PropTypes.bool,
     align: PropTypes.oneOf(['start', 'center', 'end']),
+    damping: PropTypes.number,
     activeItemIndex: PropTypes.number,
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
@@ -514,6 +507,7 @@ Carousel.defaultProps = {
     infinite: false,
     snap: false,
     align: 'start',
+    damping: 300,
     activeItemIndex: 0,
 };
 
