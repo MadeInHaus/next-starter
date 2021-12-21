@@ -201,13 +201,12 @@ const Carousel = ({
 
     const handlePointerDown = event => {
         if (!event.isPrimary) return;
+        stopAllAnimations();
         addPointerEvents();
         container.current.setPointerCapture(event.pointerId);
         dragStart.current = { t: performance.now(), x: event.screenX };
         dragRegister.current = [];
         dragScrollLock.current = false;
-        cancelAnimationFrame(rafThrow.current);
-        cancelAnimationFrame(rafAutoScroll.current);
     };
 
     const handlePointerUp = event => {
@@ -326,10 +325,29 @@ const Carousel = ({
     const rafAutoScroll = useRef();
     const rafThrow = useRef();
 
+    const stopAutoScrollAnimation = useCallback(() => {
+        cancelAnimationFrame(rafAutoScroll.current);
+        rafAutoScroll.current = null;
+    }, []);
+
+    const stopThrowAnimation = useCallback(() => {
+        cancelAnimationFrame(rafThrow.current);
+        rafAutoScroll.current = null;
+    }, []);
+
+    const stopAllAnimations = useCallback(() => {
+        stopAutoScrollAnimation();
+        stopThrowAnimation();
+    }, [stopAutoScrollAnimation, stopThrowAnimation]);
+
     const animateAutoScroll = useCallback(
         (v0 = 0, tweenDuration = 500) => {
-            cancelAnimationFrame(rafAutoScroll.current);
-            if (!infinite || disabled.current || autoScroll.current === 0) {
+            if (
+                !infinite ||
+                disabled.current ||
+                autoScroll.current === 0 ||
+                rafAutoScroll.current
+            ) {
                 return;
             }
             const startTime = performance.now();
@@ -352,10 +370,6 @@ const Carousel = ({
         },
         [infinite, positionItems]
     );
-
-    const animateThrowComplete = useCallback(() => {
-        animateAutoScroll();
-    }, [animateAutoScroll]);
 
     const animateThrow = useCallback(
         (v0, t0, k, duration) => {
@@ -388,7 +402,7 @@ const Carousel = ({
                 if (isNearTarget || elapsedTime >= duration) {
                     offset.current = endPos;
                     positionItems();
-                    animateThrowComplete();
+                    animateAutoScroll();
                     // console.log(
                     //     'done',
                     //     targetDist - dist,
@@ -403,7 +417,7 @@ const Carousel = ({
             };
             loop();
         },
-        [infinite, positionItems, animateAutoScroll, animateThrowComplete]
+        [infinite, positionItems, animateAutoScroll]
     );
 
     ///////////////////////////////////////////////////////////////////////////
@@ -426,17 +440,17 @@ const Carousel = ({
             snapPos.current = values.snap || 0;
             snapPosStart.current = values.snapStart || snapPos.current;
             snapPosEnd.current = values.snapEnd || snapPos.current;
-            autoScroll.current = values.autoScroll;
             disabled.current = !!values.disabled;
-            // Stop all animations
-            cancelAnimationFrame(rafThrow.current);
-            cancelAnimationFrame(rafAutoScroll.current);
+            if (Math.abs(autoScroll.current) !== Math.abs(values.autoScroll)) {
+                autoScroll.current = values.autoScroll;
+            }
             // Disable the carousel if needed
             container.current.classList.toggle('disabled', disabled.current);
             if (disabled.current !== isDisabled) {
                 setIsDisabled(disabled.current);
             }
             if (disabled.current) {
+                stopAllAnimations();
                 visibleItems.current?.forEach(index => {
                     container.current.childNodes[index].style.transform = '';
                 });
@@ -461,8 +475,12 @@ const Carousel = ({
                 const dupes = mappable(count + 1).map(() => children);
                 setItems(React.Children.map(dupes, CarouselItem));
             }
-            // Start auto scroll if needed
-            animateAutoScroll();
+            // Start or stop auto-scroll animation
+            if (autoScroll.current) {
+                animateAutoScroll();
+            } else {
+                stopAutoScrollAnimation();
+            }
         };
         handleResize();
         window.addEventListener('resize', handleResize);
