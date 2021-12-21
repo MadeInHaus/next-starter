@@ -20,10 +20,11 @@ const CarouselDemo = ({ className }) => {
             <section className={styles.section}>
                 <div className={grid.container}>
                     <Text as="h1" className={styles.headline}>
-                        Infinite Carousel, variable width items, centered
+                        Infinite Carousel, variable width items, centered, snap
                     </Text>
                 </div>
                 <Carousel
+                    snap
                     infinite
                     align="center"
                     className={styles.carouselText}
@@ -36,10 +37,10 @@ const CarouselDemo = ({ className }) => {
             <section className={styles.section}>
                 <div className={grid.container}>
                     <Text as="h1" className={styles.headline}>
-                        Infinite Carousel, fixed width items, left aligned
+                        Infinite Carousel, fixed width items, left aligned, snap
                     </Text>
                 </div>
-                <Carousel infinite className={styles.carouselKittens}>
+                <Carousel snap infinite className={styles.carouselKittens}>
                     {mappable(8).map(i => (
                         <KittenImage i={i} key={i} />
                     ))}
