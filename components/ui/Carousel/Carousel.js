@@ -396,7 +396,7 @@ const Carousel = ({
             const k = damping;
             const duration = -k * Math.log(6 / (1000 * Math.abs(v0)));
             const distance = v0 * k * (1 - Math.exp(-duration / k));
-            if (snap) {
+            if (snap && autoScroll.current === 0) {
                 const { distance: distSnap } = findSnapDistance(distance);
                 const vSnap = distSnap / (k * (1 - Math.exp(-duration / k)));
                 const durSnap = -k * Math.log(6 / (1000 * Math.abs(vSnap)));
