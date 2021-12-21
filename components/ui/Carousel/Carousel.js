@@ -75,7 +75,7 @@ const Carousel = ({
         [items.length]
     );
 
-    const findSnapPosition = useCallback(
+    const findSnapDistance = useCallback(
         distance => {
             let index = activeItemIndexInternal.current;
             let x = offset.current + distance;
@@ -334,7 +334,7 @@ const Carousel = ({
             // Start auto-scroll, if needed.
             animateAutoScroll();
             // TODO: Snap back
-            findSnapPosition(0);
+            findSnapDistance(0);
         }
     };
 
@@ -397,7 +397,7 @@ const Carousel = ({
             const duration = -k * Math.log(6 / (1000 * Math.abs(v0)));
             const distance = v0 * k * (1 - Math.exp(-duration / k));
             if (snap) {
-                const { distance: distSnap } = findSnapPosition(distance);
+                const { distance: distSnap } = findSnapDistance(distance);
                 const vSnap = distSnap / (k * (1 - Math.exp(-duration / k)));
                 const durSnap = -k * Math.log(6 / (1000 * Math.abs(vSnap)));
                 return {
@@ -414,7 +414,7 @@ const Carousel = ({
                 distance,
             };
         },
-        [damping, snap, findSnapPosition]
+        [damping, snap, findSnapDistance]
     );
 
     const animateThrow = useCallback(
