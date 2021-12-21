@@ -233,6 +233,7 @@ const Carousel = ({
 
     const handlePointerDown = event => {
         if (!event.isPrimary) return;
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
         stopAllAnimations();
         addPointerEvents();
         container.current.setPointerCapture(event.pointerId);
