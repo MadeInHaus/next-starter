@@ -1,0 +1,125 @@
+@import 'styles/breakpoints';
+@import 'styles/fonts';
+
+.root {
+    --kitten-item-width: calc(var(--grid-col-width) * 4 + var(--grid-gap) * 3);
+
+    --carousel-gap: var(--grid-gap);
+    --carousel-snap-position: 50%;
+    --carousel-item-width: var(--kitten-item-width);
+    --carousel-autoscroll: 0;
+    --carousel-disabled: 0;
+}
+
+.section {
+    &:not(:first-child) {
+        margin-top: 2rem;
+    }
+}
+
+.headline {
+    grid-column: 1 / -1;
+    margin: 2rem 0 1rem;
+}
+
+.form {
+    grid-column: 1 / -1;
+    margin: 1rem 0 2rem;
+}
+
+.select {
+    padding: 0.5rem;
+    width: min-content;
+    outline: none;
+
+    &:not(:first-child) {
+        margin-left: 1rem;
+    }
+
+    > label {
+        margin-left: 0.5rem;
+    }
+}
+
+.carouselKittens {
+}
+
+.itemKittens {
+    display: flex;
+    position: relative;
+    width: var(--kitten-item-width);
+    padding-bottom: 65%;
+    height: 0;
+
+    .index {
+        position: relative;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1.5rem;
+        font-size: 3rem;
+        font-weight: bold;
+        z-index: 1;
+    }
+
+    .imageKittens {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+
+        &.loaded {
+            animation: fadeIn 1s linear forwards;
+        }
+    }
+}
+
+.lines::before,
+.lines::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #800;
+    z-index: -1;
+}
+
+.lines {
+    &::before {
+        left: var(--carousel-snap-position);
+    }
+
+    &::after {
+        right: var(--carousel-snap-position);
+    }
+}
+
+.labels::before,
+.labels::after {
+    position: fixed;
+    bottom: 5px;
+    font-size: 12px;
+    color: #c00;
+    z-index: -1;
+}
+
+.labels {
+    &::before {
+        content: attr(data-start);
+        left: calc(var(--carousel-snap-position) + 7px);
+    }
+
+    &::after {
+        content: attr(data-start);
+        right: calc(var(--carousel-snap-position) + 7px);
+    }
+}
+
+@keyframes fadeIn {
+    100% {
+        opacity: 1;
+    }
+}

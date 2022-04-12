@@ -39,6 +39,11 @@ const Landing = () => {
                     </Link>
                 </li>
                 <li>
+                    <Link href="/demos/carousel-finite">
+                        <Text as="a">Carousel Finite</Text>
+                    </Link>
+                </li>
+                <li>
                     <Link href="/demos/test">
                         <Text as="a">Test</Text>
                     </Link>

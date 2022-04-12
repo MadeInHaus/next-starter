@@ -1,22 +1,36 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, {
+    useState,
+    useRef,
+    useCallback,
+    useEffect,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
+
 import cx from 'classnames';
 
-import { getCSSValues, hermite, sign, modulo, mappable, last } from './utils';
+import { getCSSValues, hermite, sign, modulo, last } from './utils';
 
 import styles from './Carousel.module.scss';
 
+function easeInOutCubic(x) {
+    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
 const CarouselItem = item => <div className={styles.item}>{item}</div>;
 
-const Carousel = ({
-    infinite,
-    snap,
-    align,
-    damping,
-    activeItemIndex,
-    children,
-    className,
-}) => {
+const Carousel = (props, ref) => {
+    const {
+        infinite = false,
+        snap = false,
+        align = 'start',
+        damping = 200,
+        activeItemIndex = 0,
+        children,
+        className,
+        style,
+    } = props;
+
     const container = useRef();
     const containerWidth = useRef();
     const carouselWidth = useRef();
@@ -28,15 +42,14 @@ const Carousel = ({
     const snapPosEnd = useRef();
     const itemWidth = useRef();
     const itemWidths = useRef();
+    const itemOffsets = useRef();
     const visibleItems = useRef();
     const activeItemIndexInternal = useRef(activeItemIndex);
     const offset = useRef(0);
 
     const [isDisabled, setIsDisabled] = useState(false);
 
-    const [items, setItems] = useState(
-        React.Children.map(children, CarouselItem)
-    );
+    const items = React.Children.map(children, CarouselItem);
 
     ///////////////////////////////////////////////////////////////////////////
     // POSITIONING
@@ -75,48 +88,115 @@ const Carousel = ({
         [items.length]
     );
 
+    const getItemOffset = useCallback(
+        i => {
+            const iActive = activeItemIndexInternal.current;
+            if (itemWidth.current) {
+                return (iActive - i) * (itemWidth.current + gap.current);
+            }
+            if (!itemOffsets.current.has(i)) {
+                if (i === iActive) {
+                    // Offset of activeItem is by definition 0
+                    itemOffsets.current.set(i, 0);
+                } else if (!itemOffsets.current.has(i)) {
+                    // Recurse towards activeItem
+                    const dir = sign(iActive - i);
+                    switch (align) {
+                        case 'center':
+                            const currHalf = getItemWidth(i) / 2;
+                            const nextHalf = getItemWidth(i + dir) / 2;
+                            const offset =
+                                dir * (gap.current + currHalf + nextHalf) +
+                                getItemOffset(i + dir);
+                            itemOffsets.current.set(i, offset);
+                            break;
+                        default: {
+                            const width = getItemWidth(i + Math.min(dir, 0));
+                            const offset =
+                                dir * (gap.current + width) +
+                                getItemOffset(i + dir);
+                            itemOffsets.current.set(i, offset);
+                            break;
+                        }
+                    }
+                }
+            }
+            return itemOffsets.current.get(i);
+        },
+        [align, getItemWidth]
+    );
+
+    const getEndOffset = useCallback(() => {
+        const i = items.length - 1;
+        const xAdjust = align === 'center' ? 0 : getItemWidth(i);
+        const snapPosDist =
+            containerWidth.current - snapPosStart.current - snapPosEnd.current;
+        return getItemOffset(i) + snapPosDist - xAdjust;
+    }, [align, items.length, getItemOffset, getItemWidth]);
+
     const findSnapDistance = useCallback(
         distance => {
+            // distance: calculated total distance of throw
+            // offset: position at start of throw (relative to the current
+            // activeItem aligned to snapPosStart)
+            // index: the current activeIndex
+            // x: position at end of throw
             let index = activeItemIndexInternal.current;
             let x = offset.current + distance;
             let d = 0;
             const dir = sign(x);
-            const results = [{ index, x, d }];
             if (x !== 0) {
+                // Find the best offset (nearest to x)
+                let xDelta;
+                let bestIndex = index;
+                let bestOffset = 0;
+                let bestDiff = Number.MAX_VALUE;
+                let overshoot = 0;
+                let overshootTarget = 0;
                 do {
-                    let step;
-                    switch (align) {
-                        case 'start': {
-                            const i = dir > 0 ? --index : index++;
-                            step = gap.current + getItemWidth(i);
-                            break;
-                        }
-                        case 'center':
-                            const currHalfWidth = getItemWidth(index) / 2;
-                            index -= dir;
-                            const nextHalfWidth = getItemWidth(index) / 2;
-                            step = gap.current + currHalfWidth + nextHalfWidth;
-                            break;
-                        case 'end':
-                            const i = dir > 0 ? index-- : ++index;
-                            step = gap.current + getItemWidth(i);
-                            break;
+                    d = getItemOffset(index);
+                    xDelta = x - d;
+                    if (bestDiff > Math.abs(xDelta)) {
+                        bestDiff = Math.abs(xDelta);
+                        bestOffset = d;
+                        bestIndex = index;
                     }
-                    d += step * dir;
-                    x -= step * dir;
-                    results.push({ index, x, d });
-                } while (x * dir > 0);
+                    index -= dir;
+                } while (xDelta * dir > 0);
+
+                if (!infinite) {
+                    const zeroOffset = getItemOffset(0);
+                    if (zeroOffset < x) {
+                        overshoot = -1;
+                        overshootTarget = zeroOffset;
+                    }
+                    const endOffset = getEndOffset();
+                    if (endOffset > x) {
+                        overshoot = 1;
+                        overshootTarget = endOffset;
+                    }
+                    xDelta = x - endOffset;
+                    if (bestDiff > Math.abs(xDelta)) {
+                        // We're close enough to snapPosEnd to land there
+                        bestOffset = endOffset;
+                        bestIndex = null;
+                    }
+                }
+
+                return {
+                    overshoot,
+                    overshootTarget,
+                    index: bestIndex,
+                    distance: bestOffset - offset.current,
+                };
             }
-            // Get item with smallest x
-            const result = results.sort(
-                (a, b) => Math.abs(a.x) - Math.abs(b.x)
-            )[0];
             return {
-                index: result.index,
-                distance: result.d - offset.current,
+                index,
+                overshoot: 0,
+                distance: -offset.current,
             };
         },
-        [align, getItemWidth]
+        [infinite, getItemOffset, getEndOffset]
     );
 
     const getItemPosition = useCallback(
@@ -160,8 +240,6 @@ const Carousel = ({
                     node.style.transform = translate;
                 }
             }
-            // const visibility = isVisible ? 'visible' : 'hidden';
-            // console.log(`${index} ${x1} ${x2} ${visibility}`);
         },
         [infinite]
     );
@@ -215,6 +293,7 @@ const Carousel = ({
 
     const rafAutoScroll = useRef();
     const rafThrow = useRef();
+    const rafSnapBack = useRef();
 
     const stopAutoScrollAnimation = useCallback(() => {
         cancelAnimationFrame(rafAutoScroll.current);
@@ -223,22 +302,32 @@ const Carousel = ({
 
     const stopThrowAnimation = useCallback(() => {
         cancelAnimationFrame(rafThrow.current);
-        rafAutoScroll.current = null;
+        rafThrow.current = null;
+    }, []);
+
+    const stopSnapBackAnimation = useCallback(() => {
+        cancelAnimationFrame(rafSnapBack.current);
+        rafSnapBack.current = null;
     }, []);
 
     const stopAllAnimations = useCallback(() => {
         stopAutoScrollAnimation();
         stopThrowAnimation();
-    }, [stopAutoScrollAnimation, stopThrowAnimation]);
+        stopSnapBackAnimation();
+    }, [stopAutoScrollAnimation, stopThrowAnimation, stopSnapBackAnimation]);
+
+    const shouldStartAutoScroll = useCallback(() => {
+        return (
+            infinite &&
+            autoScroll.current !== 0 &&
+            !disabled.current &&
+            !rafAutoScroll.current
+        );
+    }, [infinite]);
 
     const animateAutoScroll = useCallback(
         (v0 = 0, tweenDuration = 500) => {
-            if (
-                !infinite ||
-                disabled.current ||
-                autoScroll.current === 0 ||
-                rafAutoScroll.current
-            ) {
+            if (!shouldStartAutoScroll()) {
                 return;
             }
             const startTime = performance.now();
@@ -259,7 +348,7 @@ const Carousel = ({
             };
             rafAutoScroll.current = requestAnimationFrame(loop);
         },
-        [infinite, positionItems]
+        [positionItems, shouldStartAutoScroll]
     );
 
     const animateThrowSnap = useCallback(
@@ -268,7 +357,11 @@ const Carousel = ({
             const duration = -k * Math.log(6 / (1000 * Math.abs(v0)));
             const distance = v0 * k * (1 - Math.exp(-duration / k));
             if (snap && autoScroll.current === 0) {
-                const { distance: distSnap } = findSnapDistance(distance);
+                const {
+                    distance: distSnap,
+                    overshoot,
+                    overshootTarget,
+                } = findSnapDistance(distance);
                 const vSnap = distSnap / (k * (1 - Math.exp(-duration / k)));
                 const durSnap = -k * Math.log(6 / (1000 * Math.abs(vSnap)));
                 return {
@@ -276,6 +369,8 @@ const Carousel = ({
                     velocity: vSnap,
                     duration: durSnap,
                     distance: distSnap,
+                    overshoot,
+                    overshootTarget,
                 };
             }
             return {
@@ -283,14 +378,22 @@ const Carousel = ({
                 velocity: v0,
                 duration,
                 distance,
+                overshoot: 0,
             };
         },
-        [damping, snap, findSnapDistance]
+        [snap, damping, findSnapDistance]
     );
 
     const animateThrow = useCallback(
         (v0, t0) => {
-            const { k, velocity, duration, distance } = animateThrowSnap(v0);
+            const {
+                k,
+                velocity,
+                duration,
+                distance,
+                overshoot,
+                overshootTarget,
+            } = animateThrowSnap(v0);
             const startPos = offset.current;
             const endPos = startPos + distance;
             if (sign(velocity) !== sign(autoScroll.current)) {
@@ -302,8 +405,7 @@ const Carousel = ({
                 const currentTime = performance.now();
                 const elapsedTime = currentTime - t0;
                 const exp = Math.exp(-elapsedTime / k);
-                const d = velocity * k * (1 - exp);
-                if (infinite && autoScroll.current !== 0) {
+                if (shouldStartAutoScroll()) {
                     // If auto-scroll is enabled, and the velocity of the
                     // throw gets smaller than the auto-scroll velocity,
                     // auto-scroll takes over.
@@ -313,9 +415,23 @@ const Carousel = ({
                         return;
                     }
                 }
-                // Exit condition:
-                // We're either sufficiently near the target,
-                // or we're out of time (the latter being a fail-safe).
+                // Total distance traveled until now
+                const d = velocity * k * (1 - exp);
+                // Test for overshoot and snap back if this is a finite carousel
+                if (!infinite) {
+                    const pos = d + startPos;
+                    if (overshoot == -1 && pos > overshootTarget + 200) {
+                        animateSnapBack(overshootTarget);
+                        return;
+                    }
+                    if (overshoot == 1 && pos < overshootTarget - 200) {
+                        animateSnapBack(overshootTarget);
+                        return;
+                    }
+                }
+                // Exit condition: We're either
+                // - sufficiently near the target (normal exit)
+                // - or out of time (fail-safe)
                 const isNearTarget = Math.abs(distance - d) < 0.1;
                 const isOutOfTime = elapsedTime >= duration;
                 if (isNearTarget || isOutOfTime) {
@@ -338,7 +454,38 @@ const Carousel = ({
             };
             loop();
         },
-        [infinite, positionItems, animateAutoScroll, animateThrowSnap]
+        [
+            animateThrowSnap,
+            animateAutoScroll,
+            animateSnapBack,
+            shouldStartAutoScroll,
+            positionItems,
+            infinite,
+        ]
+    );
+
+    const animateSnapBack = useCallback(
+        (targetOffset, tweenDuration = 300) => {
+            const startTime = performance.now();
+            const startOffset = offset.current;
+            const loop = () => {
+                const currentTime = performance.now();
+                const elapsedTime = currentTime - startTime;
+                const t = elapsedTime / tweenDuration;
+                if (t < 1) {
+                    const ease = easeInOutCubic(t);
+                    const dist = targetOffset - startOffset;
+                    offset.current = startOffset + dist * ease;
+                    rafSnapBack.current = requestAnimationFrame(loop);
+                } else {
+                    offset.current = targetOffset;
+                    rafSnapBack.current = null;
+                }
+                positionItems();
+            };
+            rafSnapBack.current = requestAnimationFrame(loop);
+        },
+        [positionItems]
     );
 
     ///////////////////////////////////////////////////////////////////////////
@@ -421,7 +568,7 @@ const Carousel = ({
             // Prevent-defaulting touchmove events:
             // - Browser won't scroll and take over the pointer
             // - Pointer events continue to be dispatched to us
-            event.preventDefault();
+            if (event.cancelable) event.preventDefault();
         }
     };
 
@@ -463,10 +610,19 @@ const Carousel = ({
             animateThrow(v0, t0);
         } else {
             // This was not a throw.
-            // Start auto-scroll, if needed.
-            animateAutoScroll();
-            // TODO: Snap back
-            findSnapDistance(0);
+            if (shouldStartAutoScroll()) {
+                // Auto scroll
+                animateAutoScroll();
+            } else {
+                // Snap back
+                let { distance, overshoot, overshootTarget } =
+                    findSnapDistance(0);
+                if (!infinite && overshoot) {
+                    animateSnapBack(overshootTarget);
+                } else if (snap) {
+                    animateSnapBack(offset.current + distance);
+                }
+            }
         }
     };
 
@@ -601,100 +757,106 @@ const Carousel = ({
     // EFFECTS
     ///////////////////////////////////////////////////////////////////////////
 
+    const handleResize = useCallback(() => {
+        // Get pixel values from CSS custom properties:
+        // --carousel-gap
+        // --carousel-snap-position
+        // --carousel-snap-position-start
+        // --carousel-snap-position-end
+        // --carousel-item-width
+        // --carousel-autoscroll
+        // --carousel-disabled
+        const values = getCSSValues(container.current);
+        gap.current = Math.max(values.gap || 0, 0);
+        itemWidth.current = Math.max(values.width || 0, 0);
+        snapPos.current = values.snap || 0;
+        snapPosStart.current = values.snapStart || snapPos.current;
+        snapPosEnd.current = values.snapEnd || snapPos.current;
+        disabled.current = !!values.disabled;
+        if (Math.abs(autoScroll.current) !== Math.abs(values.autoScroll)) {
+            autoScroll.current = values.autoScroll;
+        }
+        // Disable the carousel if needed
+        container.current.classList.toggle('disabled', disabled.current);
+        if (disabled.current !== isDisabled) {
+            setIsDisabled(disabled.current);
+        }
+        if (disabled.current) {
+            stopAllAnimations();
+            visibleItems.current?.forEach(index => {
+                container.current.childNodes[index].style.transform = '';
+            });
+            return;
+        }
+        // Initialize some other refs:
+        const { width } = container.current.getBoundingClientRect();
+        containerWidth.current = width;
+        carouselWidth.current = 0;
+        itemWidths.current = new Map();
+        itemOffsets.current = new Map();
+        if (activeItemIndexInternal.current !== activeItemIndex) {
+            activeItemIndexInternal.current = activeItemIndex;
+        }
+        try {
+            positionItems();
+        } catch (e) {
+            console.error('boom');
+            throw e;
+        }
+        // Start or stop auto-scroll animation
+        if (autoScroll.current) {
+            animateAutoScroll();
+        } else {
+            stopAutoScrollAnimation();
+        }
+    }, [
+        isDisabled,
+        positionItems,
+        activeItemIndex,
+        animateAutoScroll,
+        stopAllAnimations,
+        stopAutoScrollAnimation,
+    ]);
+
     useEffect(() => {
-        const handleResize = () => {
-            // Get pixel values from CSS custom properties:
-            // --carousel-gap
-            // --carousel-snap-position
-            // --carousel-snap-position-start
-            // --carousel-snap-position-end
-            // --carousel-item-width
-            // --carousel-autoscroll
-            // --carousel-disabled
-            const values = getCSSValues(container.current);
-            gap.current = Math.max(values.gap || 0, 0);
-            itemWidth.current = Math.max(values.width || 0, 0);
-            snapPos.current = values.snap || 0;
-            snapPosStart.current = values.snapStart || snapPos.current;
-            snapPosEnd.current = values.snapEnd || snapPos.current;
-            disabled.current = !!values.disabled;
-            if (Math.abs(autoScroll.current) !== Math.abs(values.autoScroll)) {
-                autoScroll.current = values.autoScroll;
-            }
-            // Disable the carousel if needed
-            container.current.classList.toggle('disabled', disabled.current);
-            if (disabled.current !== isDisabled) {
-                setIsDisabled(disabled.current);
-            }
-            if (disabled.current) {
-                stopAllAnimations();
-                visibleItems.current?.forEach(index => {
-                    container.current.childNodes[index].style.transform = '';
-                });
-                return;
-            }
-            // Initialize some other refs:
-            const { width } = container.current.getBoundingClientRect();
-            containerWidth.current = width;
-            carouselWidth.current = 0;
-            itemWidths.current = new Map();
-            try {
-                // Initial positioning
-                positionItems();
-            } catch (e) {
-                console.error('boom');
-                throw e;
-                // TODO: DON'T DO THIS
-                // This is an infinite carousel and it doesn't have
-                // enough items to fill the entire container:
-                // Duplicate children until we have enough items.
-                const count = items.length / React.Children.count(children);
-                const dupes = mappable(count + 1).map(() => children);
-                setItems(React.Children.map(dupes, CarouselItem));
-            }
-            // Start or stop auto-scroll animation
-            if (autoScroll.current) {
-                animateAutoScroll();
-            } else {
-                stopAutoScrollAnimation();
-            }
-        };
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-        // Note: `children` is another dependency but `items.length` should suffice
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [items.length, isDisabled, positionItems]);
+    }, [handleResize]);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            refresh: () => {
+                handleResize();
+            },
+        }),
+        [handleResize]
+    );
 
     return (
         <div
             ref={container}
             onPointerDown={isDisabled ? null : handlePointerDown}
             className={cx(styles.root, className)}
+            style={style}
         >
             {items}
         </div>
     );
 };
 
-Carousel.propTypes = {
-    infinite: PropTypes.bool,
-    snap: PropTypes.bool,
-    align: PropTypes.oneOf(['start', 'center', 'end']),
-    damping: PropTypes.number,
-    activeItemIndex: PropTypes.number,
-    children: PropTypes.node.isRequired,
-    className: PropTypes.string,
-};
+// Carousel.propTypes = {
+//     infinite: PropTypes.bool,
+//     snap: PropTypes.bool,
+//     align: PropTypes.oneOf(['start', 'center', 'end']),
+//     damping: PropTypes.number,
+//     activeItemIndex: PropTypes.number,
+//     children: PropTypes.node.isRequired,
+//     className: PropTypes.string,
+//     style: PropTypes.object,
+// };
 
-Carousel.defaultProps = {
-    infinite: false,
-    snap: false,
-    align: 'start',
-    damping: 300,
-    activeItemIndex: 0,
-};
-
-export default Carousel;
+export default forwardRef(Carousel);
