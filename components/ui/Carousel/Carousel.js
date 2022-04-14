@@ -17,7 +17,15 @@ function easeInOutCubic(x) {
     return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 
-const CarouselItem = item => <div className={styles.item}>{item}</div>;
+const CarouselItem = ({ className, children }) => {
+    const handleDragStart = e => e.preventDefault();
+    const rootClass = cx(styles.item, className);
+    return (
+        <div onDragStart={handleDragStart} className={rootClass}>
+            {children}
+        </div>
+    );
+};
 
 const Carousel = (props, ref) => {
     const {
@@ -26,8 +34,10 @@ const Carousel = (props, ref) => {
         align = 'start',
         damping = 200,
         activeItemIndex = 0,
+        as: Container = 'div',
         children,
         className,
+        itemClassName,
         style,
     } = props;
 
@@ -49,7 +59,10 @@ const Carousel = (props, ref) => {
 
     const [isDisabled, setIsDisabled] = useState(false);
 
-    const items = React.Children.map(children, CarouselItem);
+    const items = React.Children.map(children, child => {
+        if (isDisabled) return child;
+        return <CarouselItem className={itemClassName}>{child}</CarouselItem>;
+    });
 
     ///////////////////////////////////////////////////////////////////////////
     // POSITIONING
@@ -384,6 +397,30 @@ const Carousel = (props, ref) => {
         [snap, damping, findSnapDistance]
     );
 
+    const animateSnapBack = useCallback(
+        (targetOffset, tweenDuration = 300) => {
+            const startTime = performance.now();
+            const startOffset = offset.current;
+            const loop = () => {
+                const currentTime = performance.now();
+                const elapsedTime = currentTime - startTime;
+                const t = elapsedTime / tweenDuration;
+                if (t < 1) {
+                    const ease = easeInOutCubic(t);
+                    const dist = targetOffset - startOffset;
+                    offset.current = startOffset + dist * ease;
+                    rafSnapBack.current = requestAnimationFrame(loop);
+                } else {
+                    offset.current = targetOffset;
+                    rafSnapBack.current = null;
+                }
+                positionItems();
+            };
+            rafSnapBack.current = requestAnimationFrame(loop);
+        },
+        [positionItems]
+    );
+
     const animateThrow = useCallback(
         (v0, t0) => {
             const {
@@ -464,50 +501,31 @@ const Carousel = (props, ref) => {
         ]
     );
 
-    const animateSnapBack = useCallback(
-        (targetOffset, tweenDuration = 300) => {
-            const startTime = performance.now();
-            const startOffset = offset.current;
-            const loop = () => {
-                const currentTime = performance.now();
-                const elapsedTime = currentTime - startTime;
-                const t = elapsedTime / tweenDuration;
-                if (t < 1) {
-                    const ease = easeInOutCubic(t);
-                    const dist = targetOffset - startOffset;
-                    offset.current = startOffset + dist * ease;
-                    rafSnapBack.current = requestAnimationFrame(loop);
-                } else {
-                    offset.current = targetOffset;
-                    rafSnapBack.current = null;
-                }
-                positionItems();
-            };
-            rafSnapBack.current = requestAnimationFrame(loop);
-        },
-        [positionItems]
-    );
-
     ///////////////////////////////////////////////////////////////////////////
     // POINTER EVENTS, DRAGGING, THROWING
     ///////////////////////////////////////////////////////////////////////////
 
     const dragStart = useRef();
-    const dragScrollLock = useRef();
     const dragRegister = useRef();
+    const dragScrollLock = useRef();
+    const dragPreventClick = useRef();
 
     const addPointerEvents = () => {
         window.addEventListener('pointerup', handlePointerUp);
         window.addEventListener('pointercancel', handlePointerCancel);
         window.addEventListener('pointermove', handlePointerMove);
-        container.current.addEventListener('touchmove', handleTouchMove);
+        if (container.current) {
+            container.current.addEventListener('touchmove', handleTouchMove);
+        }
     };
 
     const removePointerEvents = () => {
         window.removeEventListener('pointerup', handlePointerUp);
         window.removeEventListener('pointercancel', handlePointerCancel);
         window.removeEventListener('pointermove', handlePointerMove);
-        container.current.removeEventListener('touchmove', handleTouchMove);
+        if (container.current) {
+            container.current.removeEventListener('touchmove', handleTouchMove);
+        }
     };
 
     const handlePointerDown = event => {
@@ -515,10 +533,12 @@ const Carousel = (props, ref) => {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         stopAllAnimations();
         addPointerEvents();
-        container.current.setPointerCapture(event.pointerId);
+
         dragStart.current = { t: performance.now(), x: event.screenX };
         dragRegister.current = [];
         dragScrollLock.current = false;
+        dragPreventClick.current = false;
+
         if (infinite) {
             const carouselWidth = getCarouselWidth();
             if (carouselWidth > 0) {
@@ -532,14 +552,12 @@ const Carousel = (props, ref) => {
 
     const handlePointerUp = event => {
         if (!event.isPrimary) return;
-        removePointerEvents();
-        dragEnd();
+        dragEnd(event);
     };
 
     const handlePointerCancel = event => {
         if (!event.isPrimary) return;
-        removePointerEvents();
-        dragEnd();
+        dragEnd(event);
     };
 
     const handlePointerMove = event => {
@@ -550,6 +568,13 @@ const Carousel = (props, ref) => {
             const distTotal = Math.abs(event.screenX - dragStart.current.x);
             dragScrollLock.current = distTotal >= 5;
         }
+        if (dragScrollLock.current) {
+            // This needs to be set, otherwise we won't get pointer up/cancel
+            // events when the mouse leaves the window on drag
+            container.current.setPointerCapture(event.pointerId);
+        }
+        // Dragged at all: set flag to prevent clicks
+        dragPreventClick.current = true;
         // Determine current position and velocity:
         const prev = last(dragRegister.current) || dragStart.current;
         const t = performance.now();
@@ -565,15 +590,26 @@ const Carousel = (props, ref) => {
 
     const handleTouchMove = event => {
         if (dragScrollLock.current) {
-            // Prevent-defaulting touchmove events:
+            // Prevent-default touchmove events:
             // - Browser won't scroll and take over the pointer
             // - Pointer events continue to be dispatched to us
             if (event.cancelable) event.preventDefault();
         }
     };
 
-    const dragEnd = () => {
+    const handleClick = event => {
+        if (dragPreventClick.current) {
+            // Prevent-default click events:
+            // After dragging, we don't want a dangling click to go through
+            if (event.cancelable) event.preventDefault();
+        }
+    };
+
+    const dragEnd = event => {
+        // Clean up:
         dragScrollLock.current = false;
+        container.current.releasePointerCapture(event.pointerId);
+        removePointerEvents();
         // Determine velocity v0:
         // Disregard first sample
         dragRegister.current.shift();
@@ -625,6 +661,16 @@ const Carousel = (props, ref) => {
             }
         }
     };
+
+    useEffect(() => {
+        const el = container.current;
+        el.addEventListener('click', handleClick);
+        return () => {
+            el.removeEventListener('click', handleClick);
+            removePointerEvents();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     ///////////////////////////////////////////////////////////////////////////
     // MOUSE WHEEL
@@ -695,7 +741,7 @@ const Carousel = (props, ref) => {
 
     const handleWheel = useCallback(
         event => {
-            if (wheelDisabled.current) return;
+            if (wheelDisabled.current || disabled.current) return;
             // https://github.com/facebook/react/blob/master/packages/react-dom/src/events/SyntheticEvent.js#L556-L559
             // > Browsers without "deltaMode" is reporting in raw wheel delta where
             // > one notch on the scroll is always +/- 120, roughly equivalent to
@@ -837,14 +883,14 @@ const Carousel = (props, ref) => {
     );
 
     return (
-        <div
+        <Container
             ref={container}
             onPointerDown={isDisabled ? null : handlePointerDown}
             className={cx(styles.root, className)}
             style={style}
         >
             {items}
-        </div>
+        </Container>
     );
 };
 
