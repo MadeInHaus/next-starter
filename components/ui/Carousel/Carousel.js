@@ -307,6 +307,7 @@ const Carousel = (props, ref) => {
     const rafAutoScroll = useRef();
     const rafThrow = useRef();
     const rafSnapBack = useRef();
+    const rafThrowOvershoot = useRef();
 
     const stopAutoScrollAnimation = useCallback(() => {
         cancelAnimationFrame(rafAutoScroll.current);
@@ -323,11 +324,22 @@ const Carousel = (props, ref) => {
         rafSnapBack.current = null;
     }, []);
 
+    const stopThrowOvershootAnimation = useCallback(() => {
+        cancelAnimationFrame(rafThrowOvershoot.current);
+        rafThrowOvershoot.current = null;
+    }, []);
+
     const stopAllAnimations = useCallback(() => {
         stopAutoScrollAnimation();
         stopThrowAnimation();
         stopSnapBackAnimation();
-    }, [stopAutoScrollAnimation, stopThrowAnimation, stopSnapBackAnimation]);
+        stopThrowOvershootAnimation();
+    }, [
+        stopAutoScrollAnimation,
+        stopThrowAnimation,
+        stopSnapBackAnimation,
+        stopThrowOvershootAnimation,
+    ]);
 
     const shouldStartAutoScroll = useCallback(() => {
         return (
@@ -344,6 +356,7 @@ const Carousel = (props, ref) => {
                 return;
             }
             const startTime = performance.now();
+            const endTime = startTime + tweenDuration;
             let lastTime = startTime;
             const loop = () => {
                 const currentTime = performance.now();
@@ -352,7 +365,7 @@ const Carousel = (props, ref) => {
                     v0,
                     autoScroll.current,
                     startTime,
-                    startTime + tweenDuration
+                    endTime
                 );
                 offset.current += (currentTime - lastTime) * v;
                 positionItems();
@@ -421,6 +434,29 @@ const Carousel = (props, ref) => {
         [positionItems]
     );
 
+    const animateThrowOvershoot = useCallback(
+        (v0, targetOffset, tweenDuration = 200) => {
+            const startTime = performance.now();
+            const endTime = startTime + tweenDuration;
+            let lastTime = startTime;
+            const loop = () => {
+                const currentTime = performance.now();
+                const v = hermite(currentTime, v0, 0, startTime, endTime);
+                offset.current += (currentTime - lastTime) * v;
+                positionItems();
+                if (Math.abs(v) < 0.001) {
+                    animateSnapBack(targetOffset, 500);
+                    rafSnapBack.current = null;
+                } else {
+                    lastTime = currentTime;
+                    rafThrowOvershoot.current = requestAnimationFrame(loop);
+                }
+            };
+            rafThrowOvershoot.current = requestAnimationFrame(loop);
+        },
+        [positionItems, animateSnapBack]
+    );
+
     const animateThrow = useCallback(
         (v0, t0) => {
             const {
@@ -442,11 +478,11 @@ const Carousel = (props, ref) => {
                 const currentTime = performance.now();
                 const elapsedTime = currentTime - t0;
                 const exp = Math.exp(-elapsedTime / k);
+                const v = velocity * exp;
                 if (shouldStartAutoScroll()) {
                     // If auto-scroll is enabled, and the velocity of the
                     // throw gets smaller than the auto-scroll velocity,
                     // auto-scroll takes over.
-                    const v = velocity * exp;
                     if (Math.abs(v) <= Math.abs(autoScroll.current)) {
                         animateAutoScroll(v, 1000);
                         return;
@@ -457,12 +493,12 @@ const Carousel = (props, ref) => {
                 // Test for overshoot and snap back if this is a finite carousel
                 if (!infinite) {
                     const pos = d + startPos;
-                    if (overshoot == -1 && pos > overshootTarget + 200) {
-                        animateSnapBack(overshootTarget);
+                    if (overshoot == -1 && pos > overshootTarget) {
+                        animateThrowOvershoot(v, overshootTarget);
                         return;
                     }
-                    if (overshoot == 1 && pos < overshootTarget - 200) {
-                        animateSnapBack(overshootTarget);
+                    if (overshoot == 1 && pos < overshootTarget) {
+                        animateThrowOvershoot(v, overshootTarget);
                         return;
                     }
                 }
@@ -494,7 +530,7 @@ const Carousel = (props, ref) => {
         [
             animateThrowSnap,
             animateAutoScroll,
-            animateSnapBack,
+            animateThrowOvershoot,
             shouldStartAutoScroll,
             positionItems,
             infinite,
