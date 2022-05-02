@@ -870,6 +870,7 @@ const Carousel = (props, ref) => {
         // --carousel-item-width
         // --carousel-autoscroll
         // --carousel-disabled
+        if (!container.current) return;
         const values = getCSSValues(container.current);
         gap.current = Math.max(values.gap || 0, 0);
         itemWidth.current = Math.max(values.width || 0, 0);
@@ -924,10 +925,10 @@ const Carousel = (props, ref) => {
 
     useEffect(() => {
         handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
+        const el = container.current;
+        const resizeObserver = new ResizeObserver(() => handleResize());
+        resizeObserver.observe(el);
+        return () => resizeObserver.unobserve(el);
     }, [handleResize]);
 
     useImperativeHandle(
@@ -942,7 +943,6 @@ const Carousel = (props, ref) => {
         }),
         [handleResize, moveIntoView]
     );
-    console.log('render');
 
     return (
         <Container
