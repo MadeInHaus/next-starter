@@ -20,6 +20,7 @@
 .headline {
     grid-column: 1 / -1;
     margin: 2rem 0 1rem;
+    font-size: 2.4rem;
 }
 
 .form {
@@ -28,16 +29,26 @@
 }
 
 .select {
-    padding: 0.5rem;
-    width: min-content;
-    outline: none;
+    font-size: 1.6rem;
 
     &:not(:first-child) {
-        margin-left: 1rem;
+        margin-left: 2rem;
+    }
+
+    > select {
+        padding: 0.3rem 0.5rem;
+        width: min-content;
+        outline: none;
     }
 
     > label {
-        margin-left: 0.5rem;
+        &:first-child {
+            margin-right: 1rem;
+        }
+
+        &:last-child {
+            margin-left: 0.5rem;
+        }
     }
 }
 

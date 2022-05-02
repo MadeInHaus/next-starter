@@ -10,11 +10,12 @@ export function getCSSValues(container) {
     const DISABLED = '--carousel-disabled';
     const dummy = document.createElement('div');
     const styles = [
+        `position: relative`,
         `padding-left: var(${GAP})`,
         `padding-right: var(${SNAP})`,
         `margin-left: var(${SNAPSTART})`,
         `margin-right: var(${SNAPEND})`,
-        `height: var(${WIDTH})`,
+        `left: var(${WIDTH})`,
     ];
     dummy.setAttribute('style', styles.join(';'));
     container.appendChild(dummy);
@@ -28,7 +29,7 @@ export function getCSSValues(container) {
     const snap = parseFloat(computed.getPropertyValue('padding-right'));
     const snapStart = parseFloat(computed.getPropertyValue('margin-left'));
     const snapEnd = parseFloat(computed.getPropertyValue('margin-right'));
-    const width = parseFloat(computed.getPropertyValue('height'));
+    const width = parseFloat(computed.getPropertyValue('left'));
     const autoScroll = parseFloat(computed.getPropertyValue(SCROLL)) || 0;
     const disabled = parseInt(computed.getPropertyValue(DISABLED), 10) ? 1 : 0;
     container.removeChild(dummy);

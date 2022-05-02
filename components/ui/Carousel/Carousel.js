@@ -139,13 +139,17 @@ const Carousel = (props, ref) => {
         [align, getItemWidth]
     );
 
-    const getEndOffset = useCallback(() => {
-        const i = items.length - 1;
-        const xAdjust = align === 'center' ? 0 : getItemWidth(i);
-        const snapPosDist =
-            containerWidth.current - snapPosStart.current - snapPosEnd.current;
-        return getItemOffset(i) + snapPosDist - xAdjust;
-    }, [align, items.length, getItemOffset, getItemWidth]);
+    const getEndOffset = useCallback(
+        (i = items.length - 1) => {
+            const xAdjust = align === 'center' ? 0 : getItemWidth(i);
+            const snapPosDist =
+                containerWidth.current -
+                snapPosStart.current -
+                snapPosEnd.current;
+            return getItemOffset(i) + snapPosDist - xAdjust;
+        },
+        [align, items.length, getItemOffset, getItemWidth]
+    );
 
     const findSnapDistance = useCallback(
         distance => {
@@ -215,25 +219,22 @@ const Carousel = (props, ref) => {
     const getItemPosition = useCallback(
         index => {
             let x1, x2;
-            const x = snapPosStart.current + offset.current;
-            const width = getItemWidth(index);
+            const itemWidth = getItemWidth(index);
+            const itemOffset = getItemOffset(index);
+            const x = offset.current + snapPosStart.current - itemOffset;
             switch (align) {
-                case 'start':
-                    x1 = x;
-                    x2 = x + width;
-                    break;
                 case 'center':
-                    x1 = x - width / 2;
-                    x2 = x + width / 2;
+                    x1 = x - itemWidth / 2;
+                    x2 = x + itemWidth / 2;
                     break;
-                case 'end':
-                    x1 = x - width;
-                    x2 = x;
+                default:
+                    x1 = x;
+                    x2 = x + itemWidth;
                     break;
             }
             return { x1, x2 };
         },
-        [align, getItemWidth]
+        [align, getItemWidth, getItemOffset]
     );
 
     const position = useCallback(
@@ -836,8 +837,29 @@ const Carousel = (props, ref) => {
     }, [handleWheel]);
 
     ///////////////////////////////////////////////////////////////////////////
-    // EFFECTS
+    // INIT/RESIZE/API
     ///////////////////////////////////////////////////////////////////////////
+
+    const moveIntoView = useCallback(
+        index => {
+            // TODO: infinite carousels
+            // TODO: adapt velocity to distance
+            const itemOffset = getItemOffset(index);
+            const endOffset = getEndOffset(items.length - 1);
+            // console.log({ offset: offset.current, itemOffset, endOffset });
+            // console.log(offset.current + 50 - itemOffset, getCarouselWidth());
+            // console.log(getItemPosition(index))
+            stopAllAnimations();
+            animateSnapBack(Math.max(itemOffset, endOffset));
+        },
+        [
+            items.length,
+            getItemOffset,
+            getEndOffset,
+            stopAllAnimations,
+            animateSnapBack,
+        ]
+    );
 
     const handleResize = useCallback(() => {
         // Get pixel values from CSS custom properties:
@@ -914,9 +936,13 @@ const Carousel = (props, ref) => {
             refresh: () => {
                 handleResize();
             },
+            moveIntoView: (...args) => {
+                moveIntoView(...args);
+            },
         }),
-        [handleResize]
+        [handleResize, moveIntoView]
     );
+    console.log('render');
 
     return (
         <Container
@@ -941,4 +967,4 @@ const Carousel = (props, ref) => {
 //     style: PropTypes.object,
 // };
 
-export default forwardRef(Carousel);
+export default React.memo(forwardRef(Carousel));

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, StrictMode } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
@@ -65,54 +65,64 @@ const CarouselDemo = ({ className }) => {
         setRandomWidths(event.target.checked);
     };
 
+    const handleDummyClick = event => {
+        event.preventDefault();
+        carousel.current.moveIntoView(6);
+    };
+
     const style = {
         '--carousel-snap-position': snapPosition,
         '--carousel-item-width': randomWidths ? 0 : 'var(--kitten-item-width)',
     };
 
     return (
-        <div className={cx(styles.root, className)} style={style}>
-            <section className={styles.section}>
-                <div className={grid.container}>
-                    <Text as="h1" className={styles.headline}>
-                        Playground
-                    </Text>
-                    <Form
-                        align={align}
-                        activeItemIndex={activeItemIndex}
-                        infinite={infinite}
-                        randomWidths={randomWidths}
-                        onAlignChange={handleAlignChange}
-                        onActiveItemIndexChange={handleActiveItemIndexChange}
-                        onInfiniteChange={handleInfiniteChange}
-                        onRandomWidthsChange={handleRandomWidthsChange}
-                    />
-                </div>
-                <div className={styles.lines} />
-                <div
-                    ref={ref}
-                    data-start=""
-                    data-end=""
-                    className={styles.labels}
-                />
-                <Carousel
-                    snap
-                    align={align}
-                    infinite={infinite}
-                    activeItemIndex={activeItemIndex}
-                    className={styles.carouselKittens}
-                    ref={carousel}
-                >
-                    {mappable(8).map(i => (
-                        <KittenImage
-                            i={i}
-                            key={i}
+        <StrictMode>
+            <div className={cx(styles.root, className)} style={style}>
+                <section className={styles.section}>
+                    <div className={grid.container}>
+                        <Text as="h1" className={styles.headline}>
+                            Playground
+                        </Text>
+                        <Form
+                            align={align}
+                            activeItemIndex={activeItemIndex}
+                            infinite={infinite}
                             randomWidths={randomWidths}
+                            onAlignChange={handleAlignChange}
+                            onActiveItemIndexChange={
+                                handleActiveItemIndexChange
+                            }
+                            onInfiniteChange={handleInfiniteChange}
+                            onRandomWidthsChange={handleRandomWidthsChange}
+                            onDummyClick={handleDummyClick}
                         />
-                    ))}
-                </Carousel>
-            </section>
-        </div>
+                    </div>
+                    <div className={styles.lines} />
+                    <div
+                        ref={ref}
+                        data-start=""
+                        data-end=""
+                        className={styles.labels}
+                    />
+                    <Carousel
+                        snap
+                        align={align}
+                        infinite={infinite}
+                        activeItemIndex={activeItemIndex}
+                        className={styles.carouselKittens}
+                        ref={carousel}
+                    >
+                        {mappable(8).map(i => (
+                            <KittenImage
+                                i={i}
+                                key={i}
+                                randomWidths={randomWidths}
+                            />
+                        ))}
+                    </Carousel>
+                </section>
+            </div>
+        </StrictMode>
     );
 };
 
@@ -145,33 +155,32 @@ const Form = ({
     onActiveItemIndexChange,
     onInfiniteChange,
     onRandomWidthsChange,
+    onDummyClick,
 }) => {
     return (
         <form className={styles.form}>
-            <select
-                className={styles.select}
-                onChange={onAlignChange}
-                value={align}
-            >
-                <optgroup label="align">
+            <span className={styles.select}>
+                <label htmlFor="alignSelect">align:</label>
+                <select id="alignSelect" onChange={onAlignChange} value={align}>
                     <option value="start">start</option>
                     <option value="center">center</option>
                     <option value="end">end</option>
-                </optgroup>
-            </select>
-            <select
-                className={styles.select}
-                onChange={onActiveItemIndexChange}
-                value={activeItemIndex}
-            >
-                <optgroup label="activeIndex">
+                </select>
+            </span>
+            <span className={styles.select}>
+                <label htmlFor="activeItemSelect">activeItem:</label>
+                <select
+                    id="activeItemSelect"
+                    onChange={onActiveItemIndexChange}
+                    value={activeItemIndex}
+                >
                     {mappable(8).map(i => (
                         <option key={i} value={i}>
                             {i}
                         </option>
                     ))}
-                </optgroup>
-            </select>
+                </select>
+            </span>
             <span className={styles.select}>
                 <input
                     id="infiniteCheckbox"
@@ -189,6 +198,9 @@ const Form = ({
                     onChange={onRandomWidthsChange}
                 />
                 <label htmlFor="widthsCheckbox">random widths</label>
+            </span>
+            <span className={styles.select}>
+                <button onClick={onDummyClick}>click</button>
             </span>
         </form>
     );
