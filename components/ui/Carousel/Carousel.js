@@ -210,135 +210,6 @@ const Carousel = ({
     }, [items.length, position, positionLeft, positionRight, getItemPosition]);
 
     ///////////////////////////////////////////////////////////////////////////
-    // POINTER EVENTS, DRAGGING, THROWING
-    ///////////////////////////////////////////////////////////////////////////
-
-    const dragStart = useRef();
-    const dragScrollLock = useRef();
-    const dragRegister = useRef();
-
-    const addPointerEvents = () => {
-        window.addEventListener('pointerup', handlePointerUp);
-        window.addEventListener('pointercancel', handlePointerCancel);
-        window.addEventListener('pointermove', handlePointerMove);
-        container.current.addEventListener('touchmove', handleTouchMove);
-    };
-
-    const removePointerEvents = () => {
-        window.removeEventListener('pointerup', handlePointerUp);
-        window.removeEventListener('pointercancel', handlePointerCancel);
-        window.removeEventListener('pointermove', handlePointerMove);
-        container.current.removeEventListener('touchmove', handleTouchMove);
-    };
-
-    const handlePointerDown = event => {
-        if (!event.isPrimary) return;
-        if (event.pointerType === 'mouse' && event.button !== 0) return;
-        stopAllAnimations();
-        addPointerEvents();
-        container.current.setPointerCapture(event.pointerId);
-        dragStart.current = { t: performance.now(), x: event.screenX };
-        dragRegister.current = [];
-        dragScrollLock.current = false;
-        if (infinite) {
-            const carouselWidth = getCarouselWidth();
-            if (carouselWidth > 0) {
-                offset.current = modulo(
-                    offset.current,
-                    carouselWidth + gap.current
-                );
-            }
-        }
-    };
-
-    const handlePointerUp = event => {
-        if (!event.isPrimary) return;
-        removePointerEvents();
-        dragEnd();
-    };
-
-    const handlePointerCancel = event => {
-        if (!event.isPrimary) return;
-        removePointerEvents();
-        dragEnd();
-    };
-
-    const handlePointerMove = event => {
-        if (!event.isPrimary) return;
-        if (!dragScrollLock.current) {
-            // Dragged horizontally for at least 5px: This is a legit swipe.
-            // Prevent-default touchmoves to stop browser from taking over.
-            const distTotal = Math.abs(event.screenX - dragStart.current.x);
-            dragScrollLock.current = distTotal >= 5;
-        }
-        // Determine current position and velocity:
-        const prev = last(dragRegister.current) || dragStart.current;
-        const t = performance.now();
-        const x = event.screenX;
-        const dt = t - prev.t;
-        const dx = x - prev.x;
-        if (dx !== 0) {
-            dragRegister.current.push({ t, x, dt, dx });
-            offset.current += dx;
-            positionItems();
-        }
-    };
-
-    const handleTouchMove = event => {
-        if (dragScrollLock.current) {
-            // Prevent-defaulting touchmove events:
-            // - Browser won't scroll and take over the pointer
-            // - Pointer events continue to be dispatched to us
-            event.preventDefault();
-        }
-    };
-
-    const dragEnd = () => {
-        dragScrollLock.current = false;
-        // Determine velocity v0:
-        // Disregard first sample
-        dragRegister.current.shift();
-        // Require at least 3 samples
-        if (dragRegister.current.length >= 3) {
-            // Latest sample must be less than 50ms old
-            const currentTime = performance.now();
-            const lastTime = last(dragRegister.current).t;
-            if (currentTime - lastTime < 50) {
-                // Average the last max 5 sample velocities.
-                // Latest samples are applied a smaller weight than older ones
-                // because velocity in the last one or two frames tends to
-                // decrease significantly
-                const relevantSamples = dragRegister.current
-                    .slice(-5)
-                    .reverse();
-                let v0 = 0;
-                let weightSum = 0;
-                relevantSamples.forEach((sample, i) => {
-                    v0 += ((i + 1) * sample.dx) / sample.dt;
-                    weightSum += i + 1;
-                });
-                v0 /= weightSum;
-                dragThrow(v0, lastTime);
-                return;
-            }
-        }
-        dragThrow(0, 0);
-    };
-
-    const dragThrow = (v0, t0) => {
-        if (Math.abs(v0) > 0.2 && damping > 0) {
-            // Throw it!
-            animateThrow(v0, t0);
-        } else {
-            // This was not a throw.
-            // Start auto-scroll, if needed.
-            animateAutoScroll();
-            // TODO: Snap back
-            findSnapDistance(0);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     // ANIMATIONS
     ///////////////////////////////////////////////////////////////////////////
 
@@ -469,6 +340,262 @@ const Carousel = ({
         },
         [infinite, positionItems, animateAutoScroll, animateThrowSnap]
     );
+
+    ///////////////////////////////////////////////////////////////////////////
+    // POINTER EVENTS, DRAGGING, THROWING
+    ///////////////////////////////////////////////////////////////////////////
+
+    const dragStart = useRef();
+    const dragScrollLock = useRef();
+    const dragRegister = useRef();
+
+    const addPointerEvents = () => {
+        window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('pointercancel', handlePointerCancel);
+        window.addEventListener('pointermove', handlePointerMove);
+        container.current.addEventListener('touchmove', handleTouchMove);
+    };
+
+    const removePointerEvents = () => {
+        window.removeEventListener('pointerup', handlePointerUp);
+        window.removeEventListener('pointercancel', handlePointerCancel);
+        window.removeEventListener('pointermove', handlePointerMove);
+        container.current.removeEventListener('touchmove', handleTouchMove);
+    };
+
+    const handlePointerDown = event => {
+        if (!event.isPrimary) return;
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        stopAllAnimations();
+        addPointerEvents();
+        container.current.setPointerCapture(event.pointerId);
+        dragStart.current = { t: performance.now(), x: event.screenX };
+        dragRegister.current = [];
+        dragScrollLock.current = false;
+        if (infinite) {
+            const carouselWidth = getCarouselWidth();
+            if (carouselWidth > 0) {
+                offset.current = modulo(
+                    offset.current,
+                    carouselWidth + gap.current
+                );
+            }
+        }
+    };
+
+    const handlePointerUp = event => {
+        if (!event.isPrimary) return;
+        removePointerEvents();
+        dragEnd();
+    };
+
+    const handlePointerCancel = event => {
+        if (!event.isPrimary) return;
+        removePointerEvents();
+        dragEnd();
+    };
+
+    const handlePointerMove = event => {
+        if (!event.isPrimary) return;
+        if (!dragScrollLock.current) {
+            // Dragged horizontally for at least 5px: This is a legit swipe.
+            // Prevent-default touchmoves to stop browser from taking over.
+            const distTotal = Math.abs(event.screenX - dragStart.current.x);
+            dragScrollLock.current = distTotal >= 5;
+        }
+        // Determine current position and velocity:
+        const prev = last(dragRegister.current) || dragStart.current;
+        const t = performance.now();
+        const x = event.screenX;
+        const dt = t - prev.t;
+        const dx = x - prev.x;
+        if (dx !== 0) {
+            dragRegister.current.push({ t, x, dt, dx });
+            offset.current += dx;
+            positionItems();
+        }
+    };
+
+    const handleTouchMove = event => {
+        if (dragScrollLock.current) {
+            // Prevent-defaulting touchmove events:
+            // - Browser won't scroll and take over the pointer
+            // - Pointer events continue to be dispatched to us
+            event.preventDefault();
+        }
+    };
+
+    const dragEnd = () => {
+        dragScrollLock.current = false;
+        // Determine velocity v0:
+        // Disregard first sample
+        dragRegister.current.shift();
+        // Require at least 3 samples
+        if (dragRegister.current.length >= 3) {
+            // Latest sample must be less than 50ms old
+            const currentTime = performance.now();
+            const lastTime = last(dragRegister.current).t;
+            if (currentTime - lastTime < 50) {
+                // Average the last max 5 sample velocities.
+                // Latest samples are applied a smaller weight than older ones
+                // because velocity in the last one or two frames tends to
+                // decrease significantly
+                const relevantSamples = dragRegister.current
+                    .slice(-5)
+                    .reverse();
+                let v0 = 0;
+                let weightSum = 0;
+                relevantSamples.forEach((sample, i) => {
+                    v0 += ((i + 1) * sample.dx) / sample.dt;
+                    weightSum += i + 1;
+                });
+                v0 /= weightSum;
+                dragThrow(v0, lastTime);
+                return;
+            }
+        }
+        dragThrow(0, 0);
+    };
+
+    const dragThrow = (v0, t0) => {
+        if (Math.abs(v0) > 0.2 && damping > 0) {
+            // Throw it!
+            animateThrow(v0, t0);
+        } else {
+            // This was not a throw.
+            // Start auto-scroll, if needed.
+            animateAutoScroll();
+            // TODO: Snap back
+            findSnapDistance(0);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // MOUSE WHEEL
+    ///////////////////////////////////////////////////////////////////////////
+
+    const wheelDisabled = useRef(false);
+    const wheelInertia = useRef(false);
+    const wheelData = useRef([]);
+    const wheelTimeout = useRef();
+    const wheelDirection = useRef(0);
+
+    const isInertia = useCallback(dx => {
+        const t = performance.now();
+        let len = wheelData.current.length;
+        if (len === 0) {
+            wheelData.current = [{ t, dx }];
+        } else {
+            const dt = t - last(wheelData.current).t;
+            wheelData.current.push({ t, dt, dx });
+        }
+        let result = false;
+        if (len === 1) {
+            wheelDirection.current = sign(dx);
+        } else {
+            const curDirection = sign(dx);
+            if (wheelDirection.current !== curDirection) {
+                // Change of swipe direction
+                wheelData.current = [{ t, dx }];
+                wheelDirection.current = curDirection;
+            } else {
+                const sampleSize = 8;
+                if (len > sampleSize) {
+                    let signCount = 0;
+                    let equalCount = 0;
+                    for (let i = len - sampleSize; i < len; i++) {
+                        const dxPrev = wheelData.current[i - 1].dx;
+                        const dxCur = wheelData.current[i].dx;
+                        const ddx = dxCur - dxPrev;
+                        if (ddx === 0) {
+                            // Weed out mouse wheels which always emit the same
+                            // high delta (usually >= 100)
+                            if (Math.abs(dxPrev) > 10 && Math.abs(dxCur) > 10) {
+                                equalCount++;
+                            }
+                        } else if (sign(ddx) === wheelDirection.current) {
+                            // When actively swiping, the signs of the first dy and
+                            // subsequent ddys tend to be the same (accelerate).
+                            // When inertia kicks in, the signs differ (decelerate).
+                            signCount++;
+                        }
+                    }
+                    // Report inertia, when out of the latest [sampleSize] events
+                    // - less than [sampleSize / 2] accelerated (most decelerated)
+                    // - all showed some de-/acceleration for higher deltas
+                    result =
+                        signCount < Math.round(sampleSize / 2) &&
+                        equalCount !== sampleSize;
+                }
+            }
+        }
+        return result;
+    }, []);
+
+    const onWheelTimeout = useCallback(() => {
+        wheelInertia.current = false;
+        wheelData.current = [];
+    }, []);
+
+    const handleWheel = useCallback(
+        event => {
+            if (wheelDisabled.current) return;
+            // https://github.com/facebook/react/blob/master/packages/react-dom/src/events/SyntheticEvent.js#L556-L559
+            // > Browsers without "deltaMode" is reporting in raw wheel delta where
+            // > one notch on the scroll is always +/- 120, roughly equivalent to
+            // > pixels. A good approximation of DOM_DELTA_LINE (1) is 5% of
+            // > viewport size or ~40 pixels, for DOM_DELTA_SCREEN (2) it is 87.5%
+            // > of viewport size.
+            let multiplicator = 1;
+            if (event.deltaMode === 1) {
+                multiplicator = window.innerHeight * 0.05;
+            } else if (event.deltaMode === 2) {
+                multiplicator = window.innerHeight * 0.875;
+            }
+            const dx = event.deltaX * multiplicator;
+            const dy = event.deltaY * multiplicator;
+            const a = (Math.atan2(dy, dx) * 180) / Math.PI;
+            const vertical = (a > -135 && a < -45) || (a > 45 && a < 135);
+            if (!vertical) {
+                event.preventDefault();
+                stopAutoScrollAnimation();
+                if (!isInertia(dx)) {
+                    // Swipe
+                    offset.current -= dx;
+                    positionItems();
+                    stopThrowAnimation();
+                    wheelInertia.current = false;
+                } else if (!wheelInertia.current) {
+                    // Inertia
+                    const latestData = last(wheelData.current);
+                    if (latestData.dt) {
+                        const v0 = -latestData.dx / latestData.dt;
+                        animateThrow(v0, performance.now());
+                        wheelInertia.current = true;
+                    }
+                }
+            }
+            clearTimeout(wheelTimeout.current);
+            wheelTimeout.current = setTimeout(onWheelTimeout, 100);
+        },
+        [
+            isInertia,
+            onWheelTimeout,
+            stopAutoScrollAnimation,
+            stopThrowAnimation,
+            positionItems,
+            animateThrow,
+        ]
+    );
+
+    useEffect(() => {
+        const el = container.current;
+        el.addEventListener('wheel', handleWheel);
+        return () => {
+            el.removeEventListener('wheel', handleWheel);
+            clearTimeout(wheelTimeout.current);
+        };
+    }, [handleWheel]);
 
     ///////////////////////////////////////////////////////////////////////////
     // EFFECTS

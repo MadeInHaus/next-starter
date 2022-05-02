@@ -20,7 +20,7 @@ const CarouselDemo = ({ className }) => {
             <section className={styles.section}>
                 <div className={grid.container}>
                     <Text as="h1" className={styles.headline}>
-                        Infinite Carousel, variable width items, centered, snap
+                        Infinite, variable width items, centered, snap
                     </Text>
                 </div>
                 <Carousel
@@ -37,7 +37,7 @@ const CarouselDemo = ({ className }) => {
             <section className={styles.section}>
                 <div className={grid.container}>
                     <Text as="h1" className={styles.headline}>
-                        Infinite Carousel, fixed width items, left aligned, snap
+                        Infinite, fixed width items, left aligned, snap
                     </Text>
                 </div>
                 <Carousel snap infinite className={styles.carouselKittens}>
