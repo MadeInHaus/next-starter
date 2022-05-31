@@ -17,14 +17,14 @@ function easeInOutCubic(x) {
     return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 
-const CarouselItem = ({ className, children }) => {
-    const handleDragStart = e => e.preventDefault();
-    const rootClass = cx(styles.item, className);
-    return (
-        <div onDragStart={handleDragStart} className={rootClass}>
-            {children}
-        </div>
-    );
+const CarouselItem = ({ Wrapper, isDisabled, className, children }) => {
+    const props = isDisabled
+        ? { className }
+        : {
+              className: cx(styles.item, className),
+              onDragStart: e => e.preventDefault(),
+          };
+    return <Wrapper {...props}>{children}</Wrapper>;
 };
 
 const Carousel = (props, ref) => {
@@ -34,7 +34,8 @@ const Carousel = (props, ref) => {
         align = 'start',
         damping = 200,
         activeItemIndex = 0,
-        as: Container = 'div',
+        as: Container = 'ul',
+        childAs: ChildWrapper = 'li',
         children,
         className,
         itemClassName,
@@ -60,8 +61,15 @@ const Carousel = (props, ref) => {
     const [isDisabled, setIsDisabled] = useState(false);
 
     const items = React.Children.map(children, child => {
-        if (isDisabled) return child;
-        return <CarouselItem className={itemClassName}>{child}</CarouselItem>;
+        return (
+            <CarouselItem
+                Wrapper={ChildWrapper}
+                isDisabled={isDisabled}
+                className={itemClassName}
+            >
+                {child}
+            </CarouselItem>
+        );
     });
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,14 +252,14 @@ const Carousel = (props, ref) => {
                 if (visibleItems.current.has(index)) {
                     if (infinite) {
                         throw new Error();
-                    } else {
-                        console.info('This should not happen.');
                     }
                 } else {
                     visibleItems.current.add(index);
                     const node = container.current.childNodes[index];
                     const translate = `translate3d(${x1}px, 0, 0)`;
-                    node.style.transform = translate;
+                    if (node) {
+                        node.style.transform = translate;
+                    }
                 }
             }
         },
@@ -296,7 +304,9 @@ const Carousel = (props, ref) => {
         visibleItemsPrev.forEach(index => {
             if (!visibleItems.current.has(index)) {
                 const node = container.current.childNodes[index];
-                node.style.transform = `translate3d(-200%, 0, 0)`;
+                if (node) {
+                    node.style.transform = ``;
+                }
             }
         });
     }, [items.length, position, positionLeft, positionRight, getItemPosition]);
@@ -512,14 +522,6 @@ const Carousel = (props, ref) => {
                     offset.current = endPos;
                     positionItems();
                     animateAutoScroll();
-                    // console.log(
-                    //     'done',
-                    //     v0,
-                    //     distance,
-                    //     distance - d,
-                    //     elapsedTime,
-                    //     offset.current
-                    // );
                 } else {
                     rafThrow.current = requestAnimationFrame(loop);
                     offset.current = startPos + d;
@@ -888,8 +890,11 @@ const Carousel = (props, ref) => {
         }
         if (disabled.current) {
             stopAllAnimations();
-            visibleItems.current?.forEach(index => {
-                container.current.childNodes[index].style.transform = '';
+            items.forEach((_, index) => {
+                const node = container.current?.childNodes[index];
+                if (node) {
+                    node.style.transform = '';
+                }
             });
             return;
         }
@@ -915,6 +920,7 @@ const Carousel = (props, ref) => {
             stopAutoScrollAnimation();
         }
     }, [
+        items,
         isDisabled,
         positionItems,
         activeItemIndex,
@@ -959,7 +965,7 @@ const Carousel = (props, ref) => {
 // Carousel.propTypes = {
 //     infinite: PropTypes.bool,
 //     snap: PropTypes.bool,
-//     align: PropTypes.oneOf(['start', 'center', 'end']),
+//     align: PropTypes.oneOf(['start', 'center']),
 //     damping: PropTypes.number,
 //     activeItemIndex: PropTypes.number,
 //     children: PropTypes.node.isRequired,
