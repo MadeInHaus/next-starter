@@ -10,7 +10,7 @@ const useImageLoader = () => {
     const fnRef = useCallback(
         el => {
             if (el) {
-                if (el.complete && el.naturalWidth && el.naturalHeight) {
+                if (el.complete) {
                     handleLoad();
                 } else {
                     el.addEventListener('load', handleLoad);
@@ -23,6 +23,6 @@ const useImageLoader = () => {
         [handleLoad]
     );
     return [loaded, fnRef, elRef];
-}
+};
 
 export default useImageLoader;
