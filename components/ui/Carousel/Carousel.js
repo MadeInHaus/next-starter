@@ -36,6 +36,7 @@ const Carousel = (props, ref) => {
         activeItemIndex = 0,
         as: Container = 'ul',
         childAs: ChildWrapper = 'li',
+        onActiveItemIndexChange,
         children,
         className,
         itemClassName,
@@ -178,6 +179,7 @@ const Carousel = (props, ref) => {
                 let bestDiff = Number.MAX_VALUE;
                 let overshoot = 0;
                 let overshootTarget = 0;
+
                 do {
                     d = getItemOffset(index);
                     xDelta = x - d;
@@ -204,14 +206,14 @@ const Carousel = (props, ref) => {
                     if (bestDiff > Math.abs(xDelta)) {
                         // We're close enough to snapPosEnd to land there
                         bestOffset = endOffset;
-                        bestIndex = null;
+                        bestIndex = items.length - 1;
                     }
                 }
 
                 return {
                     overshoot,
                     overshootTarget,
-                    index: bestIndex,
+                    index: Math.min(Math.max(bestIndex, 0), items.length - 1),
                     distance: bestOffset - offset.current,
                 };
             }
@@ -221,7 +223,7 @@ const Carousel = (props, ref) => {
                 distance: -offset.current,
             };
         },
-        [infinite, getItemOffset, getEndOffset]
+        [infinite, getItemOffset, getEndOffset, items.length]
     );
 
     const getItemPosition = useCallback(
@@ -252,6 +254,8 @@ const Carousel = (props, ref) => {
                 if (visibleItems.current.has(index)) {
                     if (infinite) {
                         throw new Error();
+                    } else {
+                        console.info('This should not happen.');
                     }
                 } else {
                     visibleItems.current.add(index);
@@ -398,6 +402,7 @@ const Carousel = (props, ref) => {
                     distance: distSnap,
                     overshoot,
                     overshootTarget,
+                    index,
                 } = findSnapDistance(distance);
                 const vSnap = distSnap / (k * (1 - Math.exp(-duration / k)));
                 const durSnap = -k * Math.log(6 / (1000 * Math.abs(vSnap)));
@@ -408,6 +413,7 @@ const Carousel = (props, ref) => {
                     distance: distSnap,
                     overshoot,
                     overshootTarget,
+                    index,
                 };
             }
             return {
@@ -477,6 +483,7 @@ const Carousel = (props, ref) => {
                 distance,
                 overshoot,
                 overshootTarget,
+                index,
             } = animateThrowSnap(v0);
             const startPos = offset.current;
             const endPos = startPos + distance;
@@ -484,6 +491,9 @@ const Carousel = (props, ref) => {
                 // Reverse auto-scroll direction if it goes in the
                 // opposite direction of the throw.
                 autoScroll.current *= -1;
+            }
+            if (snap && autoScroll.current === 0 && onActiveItemIndexChange) {
+                onActiveItemIndexChange(index);
             }
             const loop = () => {
                 const currentTime = performance.now();
@@ -537,6 +547,8 @@ const Carousel = (props, ref) => {
             shouldStartAutoScroll,
             positionItems,
             infinite,
+            snap,
+            onActiveItemIndexChange,
         ]
     );
 
@@ -965,9 +977,10 @@ const Carousel = (props, ref) => {
 // Carousel.propTypes = {
 //     infinite: PropTypes.bool,
 //     snap: PropTypes.bool,
-//     align: PropTypes.oneOf(['start', 'center']),
+//     align: PropTypes.oneOf(['start', 'center', 'end']),
 //     damping: PropTypes.number,
 //     activeItemIndex: PropTypes.number,
+//     onActiveItemIndexChange: PropTypes.func,
 //     children: PropTypes.node.isRequired,
 //     className: PropTypes.string,
 //     style: PropTypes.object,
