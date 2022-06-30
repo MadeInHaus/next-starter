@@ -68,3 +68,23 @@ container's width.
 
 - `refresh()`
 - `moveIntoView(itemIndex)`
+
+## Default CSS
+
+    .root:not([class~='disabled']) {
+        display: grid;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .item {
+        grid-area: 1 / -1;
+        width: fit-content;
+        will-change: transform;
+        transform: translate3d(-99999px, 0, 0);
+        user-select: none;
+
+        img {
+            pointer-events: none;
+        }
+    }
