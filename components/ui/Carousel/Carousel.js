@@ -6,10 +6,9 @@ import React, {
     forwardRef,
     useImperativeHandle,
 } from 'react';
-
 import cx from 'classnames';
 
-import { getCSSValues, hermite, sign, modulo, last } from './utils';
+import { getCSSValues, hermite, sign, modulo, last, clamp } from './utils';
 
 import styles from './Carousel.module.scss';
 
@@ -33,6 +32,9 @@ const Carousel = (props, ref) => {
         snap = false,
         align = 'start',
         damping = 200,
+        snapbackThreshold = 100,
+        maxSnapOvershootVelocity = 3,
+        maxWheelVelocity = 3,
         activeItemIndex = 0,
         as: Container = 'ul',
         childAs: ChildWrapper = 'li',
@@ -210,10 +212,16 @@ const Carousel = (props, ref) => {
                     }
                 }
 
+                // send active index when not a thow
+                const idx = Math.min(Math.max(bestIndex, 0), items.length - 1);
+                if (onActiveItemIndexChange) {
+                    onActiveItemIndexChange(idx);
+                }
+
                 return {
                     overshoot,
                     overshootTarget,
-                    index: Math.min(Math.max(bestIndex, 0), items.length - 1),
+                    index: idx,
                     distance: bestOffset - offset.current,
                 };
             }
@@ -223,7 +231,13 @@ const Carousel = (props, ref) => {
                 distance: -offset.current,
             };
         },
-        [infinite, getItemOffset, getEndOffset, items.length]
+        [
+            infinite,
+            items.length,
+            onActiveItemIndexChange,
+            getItemOffset,
+            getEndOffset,
+        ]
     );
 
     const getItemPosition = useCallback(
@@ -431,6 +445,7 @@ const Carousel = (props, ref) => {
         (targetOffset, tweenDuration = 300) => {
             const startTime = performance.now();
             const startOffset = offset.current;
+
             const loop = () => {
                 const currentTime = performance.now();
                 const elapsedTime = currentTime - startTime;
@@ -453,12 +468,19 @@ const Carousel = (props, ref) => {
 
     const animateThrowOvershoot = useCallback(
         (v0, targetOffset, tweenDuration = 200) => {
+            // max throw overshoot velocity
+            // prevents ability to throw fast and overshoot an extreme amount
+            const vel = clamp(
+                v0,
+                -maxSnapOvershootVelocity,
+                maxSnapOvershootVelocity
+            );
             const startTime = performance.now();
             const endTime = startTime + tweenDuration;
             let lastTime = startTime;
             const loop = () => {
                 const currentTime = performance.now();
-                const v = hermite(currentTime, v0, 0, startTime, endTime);
+                const v = hermite(currentTime, vel, 0, startTime, endTime);
                 offset.current += (currentTime - lastTime) * v;
                 positionItems();
                 if (Math.abs(v) < 0.001) {
@@ -471,7 +493,7 @@ const Carousel = (props, ref) => {
             };
             rafThrowOvershoot.current = requestAnimationFrame(loop);
         },
-        [positionItems, animateSnapBack]
+        [positionItems, animateSnapBack, maxSnapOvershootVelocity]
     );
 
     const animateThrow = useCallback(
@@ -632,6 +654,19 @@ const Carousel = (props, ref) => {
         const x = event.screenX;
         const dt = t - prev.t;
         const dx = x - prev.x;
+
+        // early snapback drag cancel for finite snap carousels
+        ///////////////////////////////////////////////////////////////////////
+        if (!infinite) {
+            // cancel drag early and snapback if dragged beyond snapback threshold
+            if (getFiniteBounds().leftX > snapbackThreshold) {
+                dragEnd(event);
+            }
+            if (getFiniteBounds().rightX < -snapbackThreshold) {
+                dragEnd(event);
+            }
+        }
+
         if (dx !== 0) {
             dragRegister.current.push({ t, x, dt, dx });
             offset.current += dx;
@@ -733,6 +768,11 @@ const Carousel = (props, ref) => {
     const wheelTimeout = useRef();
     const wheelDirection = useRef(0);
 
+    const wheelOvershoot = useRef(false);
+    const wheelOvershootTimeout = useRef(null);
+    // arbitrary duration used to wait until inertia is over
+    const wheelOvershootTimeoutDuration = 750;
+
     const isInertia = useCallback(dx => {
         const t = performance.now();
         let len = wheelData.current.length;
@@ -790,6 +830,51 @@ const Carousel = (props, ref) => {
         wheelData.current = [];
     }, []);
 
+    const getFiniteBounds = useCallback(() => {
+        const index = activeItemIndexInternal.current;
+        const { x1 } = getItemPosition(index);
+        const values = getCSSValues(container.current);
+        const { width } = container.current.getBoundingClientRect();
+        const leftX = x1 - values.snap;
+        const totalWidth =
+            (values.width + values.gap) * items.length -
+            (width - values.snap * 2);
+        const rightX = leftX + totalWidth;
+        return { leftX, totalWidth, rightX };
+    }, [getItemPosition, items.length]);
+
+    const engageWheelOvershootTimeout = useCallback(
+        (v0 = 0, targetOffset = 0, index) => {
+            // attemps to prevent user from seeing extreme overshoot from a high velocity throw
+            // user can still move with wheel just not engage inertia during this timeout period
+            // if there is enough inertia on the overshoot users will feel the pullback
+            // of the still decaying inertia when the timer expires
+
+            // increasing timeout means more time that the user cannot engage inertia (bad),
+            // but less chance of decaying inertia animating the track in the wrong way (good)
+
+            // as of this version, 750ms timeout is a good compromise.
+            // things still get weird if the user pruposefully tries to yank at the edges over and over
+            // basically, allow flying off the screen before coming back, or this
+
+            // all because wheel inertia cannot be cancelled or restarted.
+
+            wheelOvershoot.current = true;
+            stopAutoScrollAnimation();
+            animateThrowOvershoot(v0, targetOffset);
+            onActiveItemIndexChange(index);
+            clearTimeout(wheelOvershootTimeout.current);
+            wheelOvershootTimeout.current = setTimeout(() => {
+                wheelOvershoot.current = false;
+            }, wheelOvershootTimeoutDuration);
+        },
+        [
+            animateThrowOvershoot,
+            stopAutoScrollAnimation,
+            onActiveItemIndexChange,
+        ]
+    );
+
     const handleWheel = useCallback(
         event => {
             if (wheelDisabled.current || disabled.current) return;
@@ -812,18 +897,54 @@ const Carousel = (props, ref) => {
             if (!vertical) {
                 event.preventDefault();
                 stopAutoScrollAnimation();
+
+                // early snapback wheel cancel
+                // warning: inertia cannot be cancelled so we are using an arbitrary timeout
+                ///////////////////////////////////////////////////////////////////////
+                if (!infinite) {
+                    // engage wheel timeout and snapback if wheeled beyond snapback threshold
+                    if (getFiniteBounds().leftX > snapbackThreshold) {
+                        if (!wheelOvershoot.current) {
+                            const latestData = last(wheelData.current);
+                            const v0 = -(latestData?.dx / latestData?.dt);
+                            const { index } = animateThrowSnap(v0);
+                            engageWheelOvershootTimeout(0, 0, index);
+                        }
+                        return;
+                    }
+                    if (getFiniteBounds().rightX < -snapbackThreshold) {
+                        if (!wheelOvershoot.current) {
+                            const latestData = last(wheelData.current);
+                            const v0 = -(latestData?.dx / latestData?.dt);
+                            const { index } = animateThrowSnap(v0);
+                            engageWheelOvershootTimeout(
+                                0,
+                                -getFiniteBounds().totalWidth,
+                                index
+                            );
+                        }
+                        return;
+                    }
+                }
+
                 if (!isInertia(dx)) {
                     // Swipe
                     offset.current -= dx;
                     positionItems();
                     stopThrowAnimation();
                     wheelInertia.current = false;
-                } else if (!wheelInertia.current) {
+                } else if (!wheelInertia.current && !wheelOvershoot.current) {
                     // Inertia
                     const latestData = last(wheelData.current);
                     if (latestData.dt) {
-                        const v0 = -latestData.dx / latestData.dt;
-                        animateThrow(v0, performance.now());
+                        const v0 = -(latestData.dx / latestData.dt);
+                        // caps inertia animation speed
+                        const vel = clamp(
+                            v0,
+                            -maxWheelVelocity,
+                            maxWheelVelocity
+                        );
+                        animateThrow(vel, performance.now());
                         wheelInertia.current = true;
                     }
                 }
@@ -832,11 +953,18 @@ const Carousel = (props, ref) => {
             wheelTimeout.current = setTimeout(onWheelTimeout, 100);
         },
         [
-            isInertia,
             onWheelTimeout,
             stopAutoScrollAnimation,
-            stopThrowAnimation,
+            infinite,
+            snap,
+            isInertia,
+            getFiniteBounds,
+            snapbackThreshold,
+            animateThrowSnap,
+            engageWheelOvershootTimeout,
             positionItems,
+            stopThrowAnimation,
+            maxWheelVelocity,
             animateThrow,
         ]
     );
@@ -973,17 +1101,5 @@ const Carousel = (props, ref) => {
         </Container>
     );
 };
-
-// Carousel.propTypes = {
-//     infinite: PropTypes.bool,
-//     snap: PropTypes.bool,
-//     align: PropTypes.oneOf(['start', 'center', 'end']),
-//     damping: PropTypes.number,
-//     activeItemIndex: PropTypes.number,
-//     onActiveItemIndexChange: PropTypes.func,
-//     children: PropTypes.node.isRequired,
-//     className: PropTypes.string,
-//     style: PropTypes.object,
-// };
 
 export default React.memo(forwardRef(Carousel));
