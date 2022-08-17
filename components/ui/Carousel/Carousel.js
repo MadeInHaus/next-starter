@@ -6,6 +6,7 @@ import React, {
     forwardRef,
     useImperativeHandle,
 } from 'react';
+
 import cx from 'classnames';
 
 import { getCSSValues, hermite, sign, modulo, last, clamp } from './utils';
@@ -445,7 +446,6 @@ const Carousel = (props, ref) => {
         (targetOffset, tweenDuration = 300) => {
             const startTime = performance.now();
             const startOffset = offset.current;
-
             const loop = () => {
                 const currentTime = performance.now();
                 const elapsedTime = currentTime - startTime;
@@ -475,9 +475,11 @@ const Carousel = (props, ref) => {
                 -maxSnapOvershootVelocity,
                 maxSnapOvershootVelocity
             );
+
             const startTime = performance.now();
             const endTime = startTime + tweenDuration;
             let lastTime = startTime;
+
             const loop = () => {
                 const currentTime = performance.now();
                 const v = hermite(currentTime, vel, 0, startTime, endTime);
@@ -493,7 +495,7 @@ const Carousel = (props, ref) => {
             };
             rafThrowOvershoot.current = requestAnimationFrame(loop);
         },
-        [positionItems, animateSnapBack, maxSnapOvershootVelocity]
+        [positionItems, animateSnapBack]
     );
 
     const animateThrow = useCallback(
@@ -833,12 +835,24 @@ const Carousel = (props, ref) => {
     const getFiniteBounds = useCallback(() => {
         const index = activeItemIndexInternal.current;
         const { x1 } = getItemPosition(index);
+
         const values = getCSSValues(container.current);
         const { width } = container.current.getBoundingClientRect();
+        const widths = Array.from(itemWidths.current.values());
+
+        let widthsTotal = 0;
+
+        if (widths.length) {
+            widthsTotal =
+                widths.reduce((acc, width) => acc + width) +
+                gap.current * (items.length - 1);
+        } else {
+            widthsTotal = (values.width + values.gap) * items.length;
+        }
+
         const leftX = x1 - values.snap;
-        const totalWidth =
-            (values.width + values.gap) * items.length -
-            (width - values.snap * 2);
+        const totalWidth = widthsTotal - (width - values.snap * 2);
+
         const rightX = leftX + totalWidth;
         return { leftX, totalWidth, rightX };
     }, [getItemPosition, items.length]);
@@ -862,7 +876,7 @@ const Carousel = (props, ref) => {
             wheelOvershoot.current = true;
             stopAutoScrollAnimation();
             animateThrowOvershoot(v0, targetOffset);
-            onActiveItemIndexChange(index);
+            onActiveItemIndexChange && onActiveItemIndexChange(index);
             clearTimeout(wheelOvershootTimeout.current);
             wheelOvershootTimeout.current = setTimeout(() => {
                 wheelOvershoot.current = false;

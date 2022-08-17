@@ -22,7 +22,7 @@ const CarouselDemo = ({ className }) => {
     const carousel = useRef();
     const [align, setAlign] = useState('start');
     const [snapPosition, setSnapPosition] = useState('var(--grid-margin)');
-    const [activeItemIndex, setActiveItemIndex] = useState(2);
+    const [activeItemIndex, setActiveItemIndex] = useState(0);
     const [infinite, setInfinite] = useState(false);
     const [randomWidths, setRandomWidths] = useState(true);
 
