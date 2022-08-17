@@ -956,7 +956,6 @@ const Carousel = (props, ref) => {
             onWheelTimeout,
             stopAutoScrollAnimation,
             infinite,
-            snap,
             isInertia,
             getFiniteBounds,
             snapbackThreshold,
