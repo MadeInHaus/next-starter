@@ -1,0 +1,10 @@
+.button {
+    width: 50px;
+    height: 50px;
+    background-color: gray;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default; // better than not allowed imo
+    }
+}

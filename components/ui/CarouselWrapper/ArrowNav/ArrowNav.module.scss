@@ -1,0 +1,16 @@
+.root {
+    position: relative;
+    pointer-events: none;
+}
+
+.arrowNav {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.arrow {
+    pointer-events: auto;
+}
