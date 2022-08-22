@@ -17,12 +17,12 @@ import styles from './CarouselFinite.module.scss';
 
 const widths = [271, 446, 304, 319, 445, 554, 236, 525];
 
-const CarouselDemo = ({ className }) => {
+const CarouselFinite = ({ className }) => {
     const ref = useRef();
     const carousel = useRef();
     const [align, setAlign] = useState('start');
     const [snapPosition, setSnapPosition] = useState('var(--grid-margin)');
-    const [activeItemIndex, setActiveItemIndex] = useState(0);
+    const [activeItemIndex, setActiveItemIndex] = useState(1);
     const [infinite, setInfinite] = useState(false);
     const [randomWidths, setRandomWidths] = useState(true);
 
@@ -200,14 +200,14 @@ const Form = ({
                 <label htmlFor="widthsCheckbox">random widths</label>
             </span>
             <span className={styles.select}>
-                <button onClick={onDummyClick}>click</button>
+                <button onClick={onDummyClick}>Click to move to 6</button>
             </span>
         </form>
     );
 };
 
-CarouselDemo.propTypes = {
+CarouselFinite.propTypes = {
     className: PropTypes.string,
 };
 
-export default CarouselDemo;
+export default CarouselFinite;
