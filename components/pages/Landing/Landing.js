@@ -44,6 +44,13 @@ const Landing = () => {
                     </Link>
                 </li>
                 <li>
+                    <Link href="/demos/carousel-wrapper">
+                        <Text as="a">
+                            Carousel Wrapper Components (DotNav, ArrowNav)
+                        </Text>
+                    </Link>
+                </li>
+                <li>
                     <Link href="/demos/test">
                         <Text as="a">Test</Text>
                     </Link>
