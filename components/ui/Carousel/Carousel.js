@@ -495,7 +495,7 @@ const Carousel = (props, ref) => {
             };
             rafThrowOvershoot.current = requestAnimationFrame(loop);
         },
-        [positionItems, animateSnapBack]
+        [maxSnapOvershootVelocity, positionItems, animateSnapBack]
     );
 
     const animateThrow = useCallback(
@@ -841,24 +841,36 @@ const Carousel = (props, ref) => {
         const widths = Array.from(itemWidths.current.values());
 
         let widthsTotal = 0;
+        let randomWidthOffset;
 
         if (widths.length) {
             widthsTotal =
                 widths.reduce((acc, width) => acc + width) +
                 gap.current * (items.length - 1);
+
+            // collect widths of items before activeItemIndex
+            const offsetWidths = [];
+            for (let i = 0; i < activeItemIndex; i++) {
+                offsetWidths.push(itemWidths.current.get(i) + values.gap);
+            }
+            randomWidthOffset = offsetWidths.reduce((a, b) => a + b, 0);
         } else {
             widthsTotal = (values.width + values.gap) * items.length;
         }
 
-        const leftX = x1 - values.snap;
-        const totalWidth = widthsTotal - (width - values.snap * 2);
+        const activeIndexOffset = widths.length
+            ? randomWidthOffset
+            : activeItemIndex * (values.width + values.gap);
 
+        const leftX = x1 - values.snap - activeIndexOffset;
+        const totalWidth = widthsTotal - (width - values.snap * 2);
         const rightX = leftX + totalWidth;
+
         return { leftX, totalWidth, rightX };
-    }, [getItemPosition, items.length]);
+    }, [activeItemIndex, getItemPosition, items.length]);
 
     const engageWheelOvershootTimeout = useCallback(
-        (v0 = 0, targetOffset = 0, index) => {
+        (targetOffset = 0, index) => {
             // attemps to prevent user from seeing extreme overshoot from a high velocity throw
             // user can still move with wheel just not engage inertia during this timeout period
             // if there is enough inertia on the overshoot users will feel the pullback
@@ -875,7 +887,7 @@ const Carousel = (props, ref) => {
 
             wheelOvershoot.current = true;
             stopAutoScrollAnimation();
-            animateThrowOvershoot(v0, targetOffset);
+            animateThrowOvershoot(0, targetOffset);
             onActiveItemIndexChange && onActiveItemIndexChange(index);
             clearTimeout(wheelOvershootTimeout.current);
             wheelOvershootTimeout.current = setTimeout(() => {
@@ -921,8 +933,9 @@ const Carousel = (props, ref) => {
                         if (!wheelOvershoot.current) {
                             const latestData = last(wheelData.current);
                             const v0 = -(latestData?.dx / latestData?.dt);
-                            const { index } = animateThrowSnap(v0);
-                            engageWheelOvershootTimeout(0, 0, index);
+                            const { index, overshootTarget } =
+                                animateThrowSnap(v0);
+                            engageWheelOvershootTimeout(overshootTarget, index);
                         }
                         return;
                     }
@@ -930,12 +943,9 @@ const Carousel = (props, ref) => {
                         if (!wheelOvershoot.current) {
                             const latestData = last(wheelData.current);
                             const v0 = -(latestData?.dx / latestData?.dt);
-                            const { index } = animateThrowSnap(v0);
-                            engageWheelOvershootTimeout(
-                                0,
-                                -getFiniteBounds().totalWidth,
-                                index
-                            );
+                            const { index, overshootTarget } =
+                                animateThrowSnap(v0);
+                            engageWheelOvershootTimeout(overshootTarget, index);
                         }
                         return;
                     }
