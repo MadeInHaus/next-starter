@@ -67,8 +67,6 @@ const CarouselWrapperDemo = ({ className }) => {
         }
     }, [setAlignAndSnapPosition, maxWidth, isXLarge, align, isLarge]);
 
-    console.log('visibleItems', visibleItems);
-
     const setLineLabels = () => {
         const values = getCSSValues(labelRef.current);
         const snapPos = values.snap || 0;
