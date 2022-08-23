@@ -19,6 +19,7 @@ import grid from 'styles/modules/grid.module.scss';
 import styles from './CarouselWrapperDemo.module.scss';
 
 const widths = [271, 446, 304, 319, 445, 554, 236, 525];
+const globalMaxWidth = 1280;
 
 const CarouselWrapperDemo = ({ className }) => {
     const gridRef = useRef();
@@ -31,8 +32,10 @@ const CarouselWrapperDemo = ({ className }) => {
     const [randomWidths, setRandomWidths] = useState(false);
     const [offsetLeft, setOffsetLeft] = useState(false);
     const [maxWidth, setMaxWidth] = useState(true);
+    const [visibleItems, setVisibleItems] = useState(1);
 
     const isLarge = useMedia(`(min-width: 1280px)`, true);
+    const isXLarge = useMedia(`(min-width: 1920px)`, true);
 
     const maxWidthSnapPosition = `calc(${offsetLeft}px)`;
 
@@ -56,7 +59,15 @@ const CarouselWrapperDemo = ({ className }) => {
         setOffsetLeft(offset);
         setLineLabels();
         setAlignAndSnapPosition(align);
-    }, [setAlignAndSnapPosition, align]);
+        setVisibleItems(isLarge ? 3 : 1);
+
+        // adjusting the visible items to update arrow and dot nav appropriately with max width
+        if (maxWidth && gridRef.current.offsetWidth >= globalMaxWidth) {
+            setVisibleItems(isXLarge ? 1 : isLarge ? 2 : 1);
+        }
+    }, [setAlignAndSnapPosition, maxWidth, isXLarge, align, isLarge]);
+
+    console.log('visibleItems', visibleItems);
 
     const setLineLabels = () => {
         const values = getCSSValues(labelRef.current);
@@ -150,7 +161,7 @@ const CarouselWrapperDemo = ({ className }) => {
                             infinite={infinite}
                             activeItemIndex={activeItemIndex}
                             className={styles.carouselKittens}
-                            visibleItems={isLarge ? 3 : 1}
+                            visibleItems={visibleItems}
                             navComponent={props => (
                                 <>
                                     <DotNav
