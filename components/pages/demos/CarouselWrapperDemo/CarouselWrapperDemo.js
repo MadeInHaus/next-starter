@@ -161,7 +161,15 @@ const CarouselWrapperDemo = ({ className }) => {
                             className={styles.carouselKittens}
                             visibleItems={visibleItems}
                             navComponent={props => (
-                                <>
+                                <div
+                                    className={styles.nav}
+                                    style={{
+                                        left:
+                                            isLarge && maxWidth
+                                                ? `calc(${offsetLeft}px - var(--grid-margin))`
+                                                : null,
+                                    }}
+                                >
                                     <DotNav
                                         {...props}
                                         className={styles.dotNav}
@@ -170,7 +178,7 @@ const CarouselWrapperDemo = ({ className }) => {
                                         {...props}
                                         className={styles.arrowNav}
                                     />
-                                </>
+                                </div>
                             )}
                         >
                             {mappable(8).map(i => (

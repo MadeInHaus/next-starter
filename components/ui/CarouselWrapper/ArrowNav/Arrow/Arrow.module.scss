@@ -1,3 +1,5 @@
+@import 'styles/breakpoints';
+
 .button {
     width: 50px;
     height: 50px;
@@ -6,5 +8,12 @@
     &:disabled {
         opacity: 0.5;
         cursor: default; // better than not allowed imo
+    }
+}
+
+@include xlarge {
+    .button {
+        width: 100px;
+        height: 100px;
     }
 }

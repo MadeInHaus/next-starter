@@ -21,6 +21,8 @@
     color: black;
     font-size: 10px;
 
+    pointer-events: auto;
+
     .isActive & {
         background-color: white;
         color: gray;
