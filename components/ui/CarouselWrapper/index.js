@@ -21,6 +21,8 @@ const CarouselWrapper = (
         children,
         className,
         visibleItems,
+        snapbackThreshold,
+        maxSnapOvershootVelocity,
         showOverflowFade,
         navComponent,
         getActiveIndex,
@@ -114,6 +116,8 @@ const CarouselWrapper = (
                     infinite={infinite}
                     activeItemIndex={activeItemIndex}
                     onActiveItemIndexChange={handleIndex}
+                    snapbackThreshold={snapbackThreshold}
+                    maxSnapOvershootVelocity={maxSnapOvershootVelocity}
                     className={className}
                     style={style}
                 >

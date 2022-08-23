@@ -160,6 +160,8 @@ const CarouselWrapperDemo = ({ className }) => {
                             activeItemIndex={activeItemIndex}
                             className={styles.carouselKittens}
                             visibleItems={visibleItems}
+                            snapbackThreshold={isLarge ? 100 : 50}
+                            maxSnapOvershootVelocity={isLarge ? 3 : 2}
                             navComponent={props => (
                                 <div
                                     className={styles.nav}
