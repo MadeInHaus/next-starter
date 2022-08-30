@@ -23,7 +23,7 @@ const CarouselWrapper = (
         visibleItems,
         snapbackThreshold,
         maxSnapOvershootVelocity,
-        showOverflowFade,
+        autoTimerSeconds,
         navComponent,
         getActiveIndex,
         style,
@@ -32,6 +32,7 @@ const CarouselWrapper = (
 ) => {
     const rootRef = useRef(null);
     const carouselRef = useRef(null);
+    const timerRef = useRef(null);
     const [index, setIndex] = useState(0);
     const [inView, setInView] = useState(0);
 
@@ -46,18 +47,34 @@ const CarouselWrapper = (
     }, [intersection, rootRef]);
 
     const handleIndex = index => {
-        const visibleIndex =
-            index > children.length - visibleItems
-                ? children.length - visibleItems
-                : index;
+        if (infinite) {
+            setIndex(index);
+            getActiveIndex && getActiveIndex(index);
+        } else {
+            const visibleIndex =
+                index > children.length - visibleItems
+                    ? children.length - visibleItems
+                    : index;
 
-        setIndex(visibleIndex);
-        getActiveIndex && getActiveIndex(visibleIndex);
+            setIndex(visibleIndex);
+            getActiveIndex && getActiveIndex(visibleIndex);
+        }
     };
 
-    const handleArrowIndex = index => {
+    const setAndMove = index => {
         setIndex(index);
         carouselRef.current.moveIntoView(index);
+    };
+
+    const timerNext = useCallback(() => {
+        const finiteIndex = (index + 1) % (children.length - visibleItems + 1);
+        timerRef.current = setTimeout(() => {
+            setAndMove(infinite ? index + 1 : finiteIndex);
+        }, autoTimerSeconds * 1000);
+    }, [autoTimerSeconds, children.length, index, infinite, visibleItems]);
+
+    const handleArrowIndex = index => {
+        setAndMove(index);
     };
 
     const handleKeyUp = useCallback(
@@ -65,19 +82,25 @@ const CarouselWrapper = (
             const arrowLeft = e.keyCode === 37;
             const arrowRight = e.keyCode === 39;
             if (inView) {
-                if (
-                    arrowRight &&
-                    index + visibleItems - 1 < children.length - 1
-                ) {
-                    setIndex(index + 1);
-                    carouselRef.current.moveIntoView(index + 1);
-                } else if (arrowLeft && index > 0) {
-                    setIndex(index - 1);
-                    carouselRef.current.moveIntoView(index - 1);
+                if (infinite) {
+                    if (arrowLeft) {
+                        setAndMove(index - 1);
+                    } else if (arrowRight) {
+                        setAndMove(index + 1);
+                    }
+                } else {
+                    if (
+                        arrowRight &&
+                        index + visibleItems - 1 < children.length - 1
+                    ) {
+                        setAndMove(index + 1);
+                    } else if (arrowLeft && index > 0) {
+                        setAndMove(index - 1);
+                    }
                 }
             }
         },
-        [inView, children.length, index, visibleItems]
+        [inView, infinite, index, visibleItems, children.length]
     );
 
     useEffect(() => {
@@ -106,6 +129,28 @@ const CarouselWrapper = (
         [handleRefresh]
     );
 
+    useEffect(() => {
+        if (autoTimerSeconds) {
+            if (inView) {
+                timerNext();
+            } else {
+                timerRef.current && clearTimeout(timerRef.current);
+            }
+        }
+    }, [inView, autoTimerSeconds, index, timerNext]);
+
+    const handleResize = useCallback(() => {
+        timerRef.current && clearTimeout(timerRef.current);
+    }, []);
+
+    useEffect(() => {
+        handleResize();
+        const el = rootRef.current;
+        const resizeObserver = new ResizeObserver(() => handleResize());
+        resizeObserver.observe(el);
+        return () => resizeObserver.unobserve(el);
+    }, [handleResize]);
+
     return (
         <>
             <div ref={rootRef} className={styles.root}>
@@ -130,6 +175,7 @@ const CarouselWrapper = (
                     itemsLength: children.length,
                     setIndex: handleArrowIndex,
                     visibleItems,
+                    infinite,
                 })}
         </>
     );
@@ -140,14 +186,14 @@ CarouselWrapper.propTypes = {
     className: PropTypes.string,
     itemWidth: PropTypes.number,
     items: PropTypes.array,
-    showOverflowFade: PropTypes.bool,
     navComponent: PropTypes.func,
     visibleItems: PropTypes.number,
+    autoTimerSeconds: PropTypes.number,
 };
 
 CarouselWrapper.defaultProps = {
-    showOverflowFade: false,
     visibleItems: 1,
+    autoTimerSeconds: 0,
 };
 
 export default React.memo(forwardRef(CarouselWrapper));
