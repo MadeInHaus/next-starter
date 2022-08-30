@@ -6,11 +6,23 @@ import styles from './DotNav.module.scss';
 import { mappable } from 'utils';
 
 const DotNav = ({ index, itemsLength, className, setIndex }) => {
+    const infiniteIndexNegativeMod = (index % -itemsLength) + itemsLength;
+    const infiniteIndexNegative =
+        infiniteIndexNegativeMod === itemsLength ? 0 : infiniteIndexNegativeMod;
+    const infiniteIndexPositive = index % itemsLength;
+    const infiniteIndex =
+        index < 0 ? infiniteIndexNegative : infiniteIndexPositive;
+
     return (
         <div className={cx(styles.root, className)}>
             <div className={styles.dotNav}>
                 {mappable(itemsLength).map((_, i) => (
-                    <Dot key={i} index={index} i={i} setIndex={setIndex} />
+                    <Dot
+                        key={i}
+                        index={infiniteIndex}
+                        i={i}
+                        setIndex={setIndex}
+                    />
                 ))}
             </div>
         </div>

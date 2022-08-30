@@ -8,14 +8,19 @@ const ArrowNav = ({
     className,
     index,
     itemsLength,
-    visibleItems,
     setIndex,
+    visibleItems,
+    infinite,
 }) => {
     const handleClick = direction => () => {
-        if (direction === 'next' && index < itemsLength - 1) {
-            setIndex(index + 1, direction);
-        } else if (direction === 'prev' && index > 0) {
-            setIndex(index - 1, direction);
+        if (infinite) {
+            setIndex(direction === 'next' ? index + 1 : index - 1, direction);
+        } else {
+            if (direction === 'next' && index < itemsLength - 1) {
+                setIndex(index + 1, direction);
+            } else if (direction === 'prev' && index > 0) {
+                setIndex(index - 1, direction);
+            }
         }
     };
 
@@ -26,7 +31,7 @@ const ArrowNav = ({
                     <Arrow
                         setIndex={setIndex}
                         onClick={handleClick('prev')}
-                        disabled={index === 0}
+                        disabled={infinite ? false : index === 0}
                     >
                         prev
                     </Arrow>
@@ -36,7 +41,9 @@ const ArrowNav = ({
                         setIndex={setIndex}
                         onClick={handleClick('next')}
                         disabled={
-                            visibleItems
+                            infinite
+                                ? false
+                                : visibleItems
                                 ? index === itemsLength - visibleItems
                                 : index === itemsLength - 1
                         }
