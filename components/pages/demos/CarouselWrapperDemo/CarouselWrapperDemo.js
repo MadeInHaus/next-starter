@@ -28,11 +28,14 @@ const CarouselWrapperDemo = ({ className }) => {
     const [align, setAlign] = useState('start');
     const [snapPosition, setSnapPosition] = useState('var(--grid-margin)');
     const [activeItemIndex, setActiveItemIndex] = useState(0);
-    const [infinite, setInfinite] = useState(false);
-    const [randomWidths, setRandomWidths] = useState(false);
     const [offsetLeft, setOffsetLeft] = useState(false);
     const [maxWidth, setMaxWidth] = useState(true);
     const [visibleItems, setVisibleItems] = useState(1);
+
+    const [infinite, setInfinite] = useState(false);
+    const [randomWidths, setRandomWidths] = useState(false);
+    const [overflowFade, setOverflowFade] = useState(false);
+    const [autoTimerSeconds, setAutoTimerSeconds] = useState(0);
 
     const isLarge = useMedia(`(min-width: 1280px)`, true);
     const isXLarge = useMedia(`(min-width: 1920px)`, true);
@@ -85,7 +88,7 @@ const CarouselWrapperDemo = ({ className }) => {
     useEffectAfterFirstRender(() => {
         setLineLabels();
         carouselRef.current.refresh();
-    }, [randomWidths, snapPosition]);
+    }, [randomWidths, snapPosition, infinite]);
 
     const handleAlignChange = event => {
         const align = event.target.value;
@@ -104,8 +107,16 @@ const CarouselWrapperDemo = ({ className }) => {
         setRandomWidths(event.target.checked);
     };
 
+    const handleOverflowFadeChange = event => {
+        setOverflowFade(event.target.checked);
+    };
+
     const handleMaxWidthChange = event => {
         setMaxWidth(event.target.checked);
+    };
+
+    const handleAutoTimerChange = event => {
+        setAutoTimerSeconds(+event.target.value);
     };
 
     const style = {
@@ -118,6 +129,7 @@ const CarouselWrapperDemo = ({ className }) => {
             <div
                 className={cx(styles.root, className, {
                     [styles.maxWidth]: maxWidth,
+                    [styles.overflowFade]: overflowFade,
                 })}
                 style={style}
             >
@@ -135,13 +147,16 @@ const CarouselWrapperDemo = ({ className }) => {
                             infinite={infinite}
                             randomWidths={randomWidths}
                             maxWidth={maxWidth}
+                            autoTimerSeconds={autoTimerSeconds}
                             onAlignChange={handleAlignChange}
                             onActiveItemIndexChange={
                                 handleActiveItemIndexChange
                             }
                             onInfiniteChange={handleInfiniteChange}
                             onRandomWidthsChange={handleRandomWidthsChange}
+                            onOverflowFadeChange={handleOverflowFadeChange}
                             onMaxWidthChange={handleMaxWidthChange}
+                            onAutoTimerChange={handleAutoTimerChange}
                         />
                     </div>
                     <div className={styles.lines} />
@@ -162,6 +177,7 @@ const CarouselWrapperDemo = ({ className }) => {
                             visibleItems={visibleItems}
                             snapbackThreshold={isLarge ? 100 : 50}
                             maxSnapOvershootVelocity={isLarge ? 3 : 2}
+                            autoTimerSeconds={autoTimerSeconds}
                             navComponent={props => (
                                 <div
                                     className={styles.nav}
@@ -227,8 +243,12 @@ const Form = ({
     onActiveItemIndexChange,
     onInfiniteChange,
     onRandomWidthsChange,
+    overflowFade,
+    onOverflowFadeChange,
     maxWidth,
     onMaxWidthChange,
+    autoTimerSeconds,
+    onAutoTimerChange,
 }) => {
     return (
         <form className={styles.form}>
@@ -254,15 +274,14 @@ const Form = ({
                     ))}
                 </select>
             </span>
-            <span className={styles.select} style={{ opacity: 0.35 }}>
-                infinite coming soon
-                {/* <input
+            <span className={styles.select}>
+                <input
                     id="infiniteCheckbox"
                     type="checkbox"
                     checked={infinite}
                     onChange={onInfiniteChange}
                 />
-                <label htmlFor="infiniteCheckbox">infinite</label> */}
+                <label htmlFor="infiniteCheckbox">infinite</label>
             </span>
             <span className={styles.select}>
                 <input
@@ -275,12 +294,36 @@ const Form = ({
             </span>
             <span className={styles.select}>
                 <input
+                    id="overflowFadeCheckbox"
+                    type="checkbox"
+                    checked={overflowFade}
+                    onChange={onOverflowFadeChange}
+                />
+                <label htmlFor="overflowFadeCheckbox">overflow fade</label>
+            </span>
+            <span className={styles.select}>
+                <input
                     id="maxWidthCheckbox"
                     type="checkbox"
                     checked={maxWidth}
                     onChange={onMaxWidthChange}
                 />
                 <label htmlFor="maxWidthCheckbox">max width</label>
+            </span>
+            <span className={styles.select}>
+                <label htmlFor="autoTimerSelect">auto timer:</label>
+                <select
+                    id="autoTimerSelect"
+                    onChange={onAutoTimerChange}
+                    value={autoTimerSeconds}
+                >
+                    {mappable(8).map(i => (
+                        <option key={i} value={i}>
+                            {i}
+                        </option>
+                    ))}
+                </select>
+                (s)
             </span>
         </form>
     );
