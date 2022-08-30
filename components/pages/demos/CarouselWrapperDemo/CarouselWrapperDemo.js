@@ -88,7 +88,7 @@ const CarouselWrapperDemo = ({ className }) => {
     useEffectAfterFirstRender(() => {
         setLineLabels();
         carouselRef.current.refresh();
-    }, [randomWidths, snapPosition, infinite]);
+    }, [randomWidths, snapPosition, infinite, autoTimerSeconds]);
 
     const handleAlignChange = event => {
         const align = event.target.value;
@@ -210,6 +210,12 @@ const CarouselWrapperDemo = ({ className }) => {
                     </div>
                 </section>
             </div>
+            <div
+                style={{
+                    width: '100%',
+                    height: '200vh',
+                }}
+            />
         </StrictMode>
     );
 };

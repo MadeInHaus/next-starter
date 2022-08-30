@@ -35,6 +35,7 @@ const CarouselWrapper = (
     const timerRef = useRef(null);
     const [index, setIndex] = useState(0);
     const [inView, setInView] = useState(0);
+    const [timerPaused, setTimerPaused] = useState(false);
 
     const intersection = useIntersection(rootRef, {
         rootMargin: '0px',
@@ -73,14 +74,22 @@ const CarouselWrapper = (
         }, autoTimerSeconds * 1000);
     }, [autoTimerSeconds, children.length, index, infinite, visibleItems]);
 
-    const handleArrowIndex = index => {
+    const handleNavIndex = index => {
+        setTimerPaused(true);
         setAndMove(index);
+    };
+
+    const handlePointerInteraction = () => {
+        clearTimeout(timerRef.current);
+        setTimerPaused(true);
     };
 
     const handleKeyUp = useCallback(
         e => {
             const arrowLeft = e.keyCode === 37;
             const arrowRight = e.keyCode === 39;
+            setTimerPaused(true);
+
             if (inView) {
                 if (infinite) {
                     if (arrowLeft) {
@@ -105,7 +114,6 @@ const CarouselWrapper = (
 
     useEffect(() => {
         window.addEventListener('keyup', handleKeyUp);
-
         return () => {
             window.removeEventListener('keyup', handleKeyUp);
         };
@@ -113,7 +121,15 @@ const CarouselWrapper = (
 
     const handleRefresh = useCallback(() => {
         carouselRef.current.refresh();
-    }, []);
+
+        if (autoTimerSeconds) {
+            if (inView && !timerPaused) {
+                timerNext();
+            } else {
+                clearTimeout(timerRef.current);
+            }
+        }
+    }, [autoTimerSeconds, inView, timerNext, timerPaused]);
 
     useEffectAfterFirstRender(() => {
         handleRefresh();
@@ -131,17 +147,24 @@ const CarouselWrapper = (
 
     useEffect(() => {
         if (autoTimerSeconds) {
-            if (inView) {
+            if (inView && !timerPaused) {
                 timerNext();
             } else {
-                timerRef.current && clearTimeout(timerRef.current);
+                clearTimeout(timerRef.current);
             }
         }
-    }, [inView, autoTimerSeconds, index, timerNext]);
+    }, [inView, autoTimerSeconds, index, timerNext, timerPaused]);
 
     const handleResize = useCallback(() => {
-        timerRef.current && clearTimeout(timerRef.current);
-    }, []);
+        if (autoTimerSeconds) {
+            if (inView && !timerPaused) {
+                clearTimeout(timerRef.current);
+                timerNext();
+            } else {
+                clearTimeout(timerRef.current);
+            }
+        }
+    }, [autoTimerSeconds, inView, timerNext, timerPaused]);
 
     useEffect(() => {
         handleResize();
@@ -150,6 +173,17 @@ const CarouselWrapper = (
         resizeObserver.observe(el);
         return () => resizeObserver.unobserve(el);
     }, [handleResize]);
+
+    useEffect(() => {
+        // bring back auto timer after pause if user comes back to intersection
+        if (autoTimerSeconds && timerPaused) {
+            if (inView) {
+                setTimerPaused(false);
+                timerNext();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView]);
 
     return (
         <>
@@ -161,6 +195,7 @@ const CarouselWrapper = (
                     infinite={infinite}
                     activeItemIndex={activeItemIndex}
                     onActiveItemIndexChange={handleIndex}
+                    onPointerInteraction={handlePointerInteraction}
                     snapbackThreshold={snapbackThreshold}
                     maxSnapOvershootVelocity={maxSnapOvershootVelocity}
                     className={className}
@@ -173,7 +208,7 @@ const CarouselWrapper = (
                 navComponent({
                     index: index,
                     itemsLength: children.length,
-                    setIndex: handleArrowIndex,
+                    setIndex: handleNavIndex,
                     visibleItems,
                     infinite,
                 })}

@@ -40,6 +40,7 @@ const Carousel = (props, ref) => {
         as: Container = 'ul',
         childAs: ChildWrapper = 'li',
         onActiveItemIndexChange,
+        onPointerInteraction,
         children,
         className,
         itemClassName,
@@ -615,6 +616,8 @@ const Carousel = (props, ref) => {
     const handlePointerDown = event => {
         if (!event.isPrimary) return;
         if (event.pointerType === 'mouse' && event.button !== 0) return;
+        onPointerInteraction && onPointerInteraction();
+
         stopAllAnimations();
         addPointerEvents();
 
