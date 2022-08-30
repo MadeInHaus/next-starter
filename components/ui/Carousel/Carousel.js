@@ -213,8 +213,23 @@ const Carousel = (props, ref) => {
                     }
                 }
 
-                // send active index when not a thow
-                const idx = Math.min(Math.max(bestIndex, 0), items.length - 1);
+                const infiniteIndex = Math.max(
+                    bestIndex <= items.length - 2 &&
+                        bestIndex !== 0 &&
+                        bestIndex !== 1
+                        ? (bestIndex % -items.length) + items.length
+                        : bestIndex % items.length,
+                    0
+                );
+
+                const idx = Math.min(
+                    Math.max(
+                        infinite ? infiniteIndex % items.length : bestIndex,
+                        0
+                    ),
+                    items.length - 1
+                );
+
                 if (onActiveItemIndexChange) {
                     onActiveItemIndexChange(idx);
                 }
@@ -507,7 +522,6 @@ const Carousel = (props, ref) => {
                 distance,
                 overshoot,
                 overshootTarget,
-                index,
             } = animateThrowSnap(v0);
             const startPos = offset.current;
             const endPos = startPos + distance;
@@ -515,9 +529,6 @@ const Carousel = (props, ref) => {
                 // Reverse auto-scroll direction if it goes in the
                 // opposite direction of the throw.
                 autoScroll.current *= -1;
-            }
-            if (snap && autoScroll.current === 0 && onActiveItemIndexChange) {
-                onActiveItemIndexChange(index);
             }
             const loop = () => {
                 const currentTime = performance.now();
@@ -571,8 +582,6 @@ const Carousel = (props, ref) => {
             shouldStartAutoScroll,
             positionItems,
             infinite,
-            snap,
-            onActiveItemIndexChange,
         ]
     );
 
@@ -1011,13 +1020,18 @@ const Carousel = (props, ref) => {
             // TODO: adapt velocity to distance
             const itemOffset = getItemOffset(index);
             const endOffset = getEndOffset(items.length - 1);
+
             // console.log({ offset: offset.current, itemOffset, endOffset });
             // console.log(offset.current + 50 - itemOffset, getCarouselWidth());
             // console.log(getItemPosition(index))
+
             stopAllAnimations();
-            animateSnapBack(Math.max(itemOffset, endOffset));
+            animateSnapBack(
+                infinite ? itemOffset : Math.max(itemOffset, endOffset)
+            );
         },
         [
+            infinite,
             items.length,
             getItemOffset,
             getEndOffset,
