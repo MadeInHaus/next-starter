@@ -15,6 +15,21 @@
     }
 }
 
+.carouselKittens {
+    .overflowFade & {
+        -webkit-mask-image: linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0)
+                calc(var(--carousel-snap-position) - var(--grid-margin)),
+            rgba(0, 0, 0, 1) var(--carousel-snap-position),
+            rgba(0, 0, 0, 1) 50%,
+            rgba(0, 0, 0, 1) calc(100% - var(--carousel-snap-position)),
+            rgba(0, 0, 0, 0)
+                calc(100% - var(--carousel-snap-position) + var(--grid-margin))
+        );
+    }
+}
+
 .section {
     &:not(:first-child) {
         margin-top: 2rem;
