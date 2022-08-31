@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import useEffectAfterFirstRender from './useEffectAfterFirstRender';
-import { useIntersection } from 'react-use';
+import { useIntersection, useWindowSize } from 'react-use';
 import Carousel from 'components/ui/Carousel';
 import styles from './CarouselWrapper.module.scss';
 
@@ -36,6 +36,8 @@ const CarouselWrapper = (
     const [index, setIndex] = useState(0);
     const [inView, setInView] = useState(0);
     const [timerPaused, setTimerPaused] = useState(false);
+
+    const { width } = useWindowSize();
 
     const intersection = useIntersection(rootRef, {
         rootMargin: '0px',
@@ -80,8 +82,10 @@ const CarouselWrapper = (
     };
 
     const handlePointerInteraction = () => {
-        clearTimeout(timerRef.current);
-        setTimerPaused(true);
+        if (autoTimerSeconds) {
+            clearTimeout(timerRef.current);
+            setTimerPaused(true);
+        }
     };
 
     const handleKeyUp = useCallback(
@@ -173,6 +177,12 @@ const CarouselWrapper = (
         resizeObserver.observe(el);
         return () => resizeObserver.unobserve(el);
     }, [handleResize]);
+
+    useEffect(() => {
+        // reset position on width change
+        carouselRef.current.moveIntoView(index);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [width]);
 
     useEffect(() => {
         // bring back auto timer after pause if user comes back to intersection
