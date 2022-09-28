@@ -8,11 +8,15 @@
     --carousel-item-width: var(--kitten-item-width);
     --carousel-autoscroll: 0;
     --carousel-disabled: 0;
+    --carousel-snap-back-threshold: 50;
+    --carousel-max-snap-overshoot-velocity: 2;
 
     // visible items for dot and arrow nav active and disabled states
     --carousel-wrapper-visible-items: 1;
 
     @include large {
+        --carousel-snap-back-threshold: 100;
+        --carousel-max-snap-overshoot-velocity: 3;
         --carousel-wrapper-visible-items: 3;
     }
 

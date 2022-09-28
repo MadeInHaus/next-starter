@@ -33,8 +33,6 @@ const Carousel = (props, ref) => {
         snap = false,
         align = 'start',
         damping = 200,
-        snapbackThreshold = 100,
-        maxSnapOvershootVelocity = 3,
         maxWheelVelocity = 3,
         activeItemIndex = 0,
         as: Container = 'ul',
@@ -56,6 +54,8 @@ const Carousel = (props, ref) => {
     const snapPos = useRef();
     const snapPosStart = useRef();
     const snapPosEnd = useRef();
+    const snapbackThreshold = useRef(100);
+    const maxSnapOvershootVelocity = useRef(3);
     const itemWidth = useRef();
     const itemWidths = useRef();
     const itemOffsets = useRef();
@@ -488,8 +488,8 @@ const Carousel = (props, ref) => {
             // prevents ability to throw fast and overshoot an extreme amount
             const vel = clamp(
                 v0,
-                -maxSnapOvershootVelocity,
-                maxSnapOvershootVelocity
+                -maxSnapOvershootVelocity.current,
+                maxSnapOvershootVelocity.current
             );
 
             const startTime = performance.now();
@@ -511,7 +511,7 @@ const Carousel = (props, ref) => {
             };
             rafThrowOvershoot.current = requestAnimationFrame(loop);
         },
-        [maxSnapOvershootVelocity, positionItems, animateSnapBack]
+        [positionItems, animateSnapBack]
     );
 
     const animateThrow = useCallback(
@@ -673,10 +673,10 @@ const Carousel = (props, ref) => {
         ///////////////////////////////////////////////////////////////////////
         if (!infinite) {
             // cancel drag early and snapback if dragged beyond snapback threshold
-            if (getFiniteBounds().leftX > snapbackThreshold) {
+            if (getFiniteBounds().leftX > snapbackThreshold.current) {
                 dragEnd(event);
             }
-            if (getFiniteBounds().rightX < -snapbackThreshold) {
+            if (getFiniteBounds().rightX < -snapbackThreshold.current) {
                 dragEnd(event);
             }
         }
@@ -941,7 +941,7 @@ const Carousel = (props, ref) => {
                 ///////////////////////////////////////////////////////////////////////
                 if (!infinite) {
                     // engage wheel timeout and snapback if wheeled beyond snapback threshold
-                    if (getFiniteBounds().leftX > snapbackThreshold) {
+                    if (getFiniteBounds().leftX > snapbackThreshold.current) {
                         if (!wheelOvershoot.current) {
                             const latestData = last(wheelData.current);
                             const v0 = -(latestData?.dx / latestData?.dt);
@@ -951,7 +951,7 @@ const Carousel = (props, ref) => {
                         }
                         return;
                     }
-                    if (getFiniteBounds().rightX < -snapbackThreshold) {
+                    if (getFiniteBounds().rightX < -snapbackThreshold.current) {
                         if (!wheelOvershoot.current) {
                             const latestData = last(wheelData.current);
                             const v0 = -(latestData?.dx / latestData?.dt);
@@ -994,7 +994,6 @@ const Carousel = (props, ref) => {
             infinite,
             isInertia,
             getFiniteBounds,
-            snapbackThreshold,
             animateThrowSnap,
             engageWheelOvershootTimeout,
             positionItems,
@@ -1052,6 +1051,8 @@ const Carousel = (props, ref) => {
         // --carousel-item-width
         // --carousel-autoscroll
         // --carousel-disabled
+        // --carousel-snap-back-threshold
+        // --carousel-max-snap-overshoot-velocity
         if (!container.current) return;
         const values = getCSSValues(container.current);
         gap.current = Math.max(values.gap || 0, 0);
@@ -1060,6 +1061,11 @@ const Carousel = (props, ref) => {
         snapPosStart.current = values.snapStart || snapPos.current;
         snapPosEnd.current = values.snapEnd || snapPos.current;
         disabled.current = !!values.disabled;
+        snapbackThreshold.current =
+            values.snapbackThreshold || snapbackThreshold.current;
+        maxSnapOvershootVelocity.current =
+            values.maxSnapOvershootVelocity || maxSnapOvershootVelocity.current;
+
         if (Math.abs(autoScroll.current) !== Math.abs(values.autoScroll)) {
             autoScroll.current = values.autoScroll;
         }

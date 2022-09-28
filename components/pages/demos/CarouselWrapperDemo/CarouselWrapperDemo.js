@@ -165,8 +165,6 @@ const CarouselWrapperDemo = ({ className }) => {
                             infinite={infinite}
                             activeItemIndex={activeItemIndex}
                             className={styles.carouselKittens}
-                            snapbackThreshold={isLarge ? 100 : 50}
-                            maxSnapOvershootVelocity={isLarge ? 3 : 2}
                             autoTimerSeconds={autoTimerSeconds}
                             navComponent={props => (
                                 <div

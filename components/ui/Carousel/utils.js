@@ -8,6 +8,8 @@ export function getCSSValues(container) {
     const WIDTH = '--carousel-item-width';
     const SCROLL = '--carousel-autoscroll';
     const DISABLED = '--carousel-disabled';
+    const SNAPBACK_THRESHOLD = '--carousel-snap-back-threshold';
+    const MAX_SNAP_VELOCITY = '--carousel-max-snap-overshoot-velocity';
     const dummy = document.createElement('div');
     const styles = [
         `position: relative`,
@@ -32,6 +34,14 @@ export function getCSSValues(container) {
     const width = parseFloat(computed.getPropertyValue('left'));
     const autoScroll = parseFloat(computed.getPropertyValue(SCROLL)) || 0;
     const disabled = parseInt(computed.getPropertyValue(DISABLED), 10) ? 1 : 0;
+    const snapbackThreshold = parseInt(
+        computed.getPropertyValue(SNAPBACK_THRESHOLD),
+        10
+    );
+    const maxSnapOvershootVelocity = parseInt(
+        computed.getPropertyValue(MAX_SNAP_VELOCITY),
+        10
+    );
     container.removeChild(dummy);
     return {
         gap: hasGap && !isUndef(gap) ? gap : undefined,
@@ -41,6 +51,8 @@ export function getCSSValues(container) {
         width: hasWidth && !isUndef(width) ? width : undefined,
         autoScroll,
         disabled,
+        snapbackThreshold,
+        maxSnapOvershootVelocity,
     };
 }
 
