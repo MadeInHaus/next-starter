@@ -9,9 +9,20 @@
     --carousel-autoscroll: 0;
     --carousel-disabled: 0;
 
+    // visible items for dot and arrow nav active and disabled states
+    --carousel-wrapper-visible-items: 1;
+
+    @include large {
+        --carousel-wrapper-visible-items: 3;
+    }
+
     &.maxWidth {
         overflow: hidden;
         min-height: 100vh;
+
+        @include large {
+            --carousel-wrapper-visible-items: 2;
+        }
     }
 }
 
@@ -169,6 +180,11 @@
         content: attr(data-start);
         right: calc(var(--carousel-snap-position) + 7px);
     }
+}
+
+.carousel {
+    position: relative;
+    width: 100%;
 }
 
 .carouselWrapper {

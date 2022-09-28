@@ -20,7 +20,6 @@ const CarouselWrapper = (
         activeItemIndex,
         children,
         className,
-        visibleItems,
         snapbackThreshold,
         maxSnapOvershootVelocity,
         autoTimerSeconds,
@@ -33,6 +32,7 @@ const CarouselWrapper = (
     const rootRef = useRef(null);
     const carouselRef = useRef(null);
     const timerRef = useRef(null);
+    const visibleItems = useRef();
     const [index, setIndex] = useState(0);
     const [inView, setInView] = useState(0);
     const [timerPaused, setTimerPaused] = useState(false);
@@ -55,8 +55,8 @@ const CarouselWrapper = (
             getActiveIndex && getActiveIndex(index);
         } else {
             const visibleIndex =
-                index > children.length - visibleItems
-                    ? children.length - visibleItems
+                index > children.length - visibleItems.current
+                    ? children.length - visibleItems.current
                     : index;
 
             setIndex(visibleIndex);
@@ -70,15 +70,24 @@ const CarouselWrapper = (
     };
 
     const timerNext = useCallback(() => {
-        const finiteIndex = (index + 1) % (children.length - visibleItems + 1);
+        const finiteIndex =
+            (index + 1) % (children.length - visibleItems.current + 1);
         timerRef.current = setTimeout(() => {
             setAndMove(infinite ? index + 1 : finiteIndex);
         }, autoTimerSeconds * 1000);
-    }, [autoTimerSeconds, children.length, index, infinite, visibleItems]);
+    }, [autoTimerSeconds, children.length, index, infinite]);
 
     const handleNavIndex = index => {
         setTimerPaused(true);
-        setAndMove(index);
+        if (infinite) {
+            setAndMove(index);
+        } else {
+            const visibleIndex =
+                index > children.length - visibleItems.current
+                    ? children.length - visibleItems.current
+                    : index;
+            setAndMove(visibleIndex);
+        }
     };
 
     const handlePointerInteraction = () => {
@@ -104,7 +113,7 @@ const CarouselWrapper = (
                 } else {
                     if (
                         arrowRight &&
-                        index + visibleItems - 1 < children.length - 1
+                        index + visibleItems.current - 1 < children.length - 1
                     ) {
                         setAndMove(index + 1);
                     } else if (arrowLeft && index > 0) {
@@ -113,7 +122,7 @@ const CarouselWrapper = (
                 }
             }
         },
-        [inView, infinite, index, visibleItems, children.length]
+        [inView, infinite, index, children.length]
     );
 
     useEffect(() => {
@@ -160,6 +169,12 @@ const CarouselWrapper = (
     }, [inView, autoTimerSeconds, index, timerNext, timerPaused]);
 
     const handleResize = useCallback(() => {
+        // get carousel-wrapper css vars
+        const computed = getComputedStyle(rootRef.current);
+        visibleItems.current = parseFloat(
+            computed.getPropertyValue('--carousel-wrapper-visible-items')
+        );
+
         if (autoTimerSeconds) {
             if (inView && !timerPaused) {
                 clearTimeout(timerRef.current);
@@ -219,7 +234,7 @@ const CarouselWrapper = (
                     index: index,
                     itemsLength: children.length,
                     setIndex: handleNavIndex,
-                    visibleItems,
+                    visibleItems: visibleItems.current,
                     infinite,
                 })}
         </>
