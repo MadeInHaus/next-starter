@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback, StrictMode } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
-import { useMedia } from 'react-use';
 import { mappable } from 'utils';
 import { getCSSValues } from 'components/ui/Carousel/utils';
 
@@ -35,9 +34,7 @@ const CarouselWrapperDemo = ({ className }) => {
     const [overflowFade, setOverflowFade] = useState(false);
     const [autoTimerSeconds, setAutoTimerSeconds] = useState(0);
 
-    const isLarge = useMedia(`(min-width: 1280px)`, true);
-
-    const maxWidthSnapPosition = `calc(${offsetLeft}px)`;
+    const maxWidthSnapPosition = `${offsetLeft}px`;
 
     const setAlignAndSnapPosition = useCallback(
         align => {
@@ -170,10 +167,9 @@ const CarouselWrapperDemo = ({ className }) => {
                                 <div
                                     className={styles.nav}
                                     style={{
-                                        left:
-                                            isLarge && maxWidth
-                                                ? `calc(${offsetLeft}px - var(--grid-margin))`
-                                                : null,
+                                        left: maxWidth
+                                            ? `calc(${offsetLeft}px - var(--grid-margin))`
+                                            : null,
                                     }}
                                 >
                                     <DotNav
