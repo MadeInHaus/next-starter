@@ -110,6 +110,7 @@ const CarouselWrapperDemo = ({ className }) => {
     const style = {
         '--carousel-snap-position': snapPosition,
         '--carousel-item-width': randomWidths ? 0 : 'var(--kitten-item-width)',
+        '--offset-left': `${offsetLeft}px`,
     };
 
     return (
@@ -164,14 +165,7 @@ const CarouselWrapperDemo = ({ className }) => {
                             className={styles.carouselKittens}
                             autoTimerSeconds={autoTimerSeconds}
                             navComponent={props => (
-                                <div
-                                    className={styles.nav}
-                                    style={{
-                                        left: maxWidth
-                                            ? `calc(${offsetLeft}px - var(--grid-margin))`
-                                            : null,
-                                    }}
-                                >
+                                <div className={styles.nav}>
                                     <DotNav
                                         {...props}
                                         className={styles.dotNav}

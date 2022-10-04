@@ -205,6 +205,7 @@
 
     .maxWidth & {
         max-width: calc(1280px + (var(--grid-margin) * 2));
+        left: calc(var(--offset-left) - var(--grid-margin));
     }
 }
 
