@@ -20,8 +20,6 @@ const CarouselWrapper = (
         activeItemIndex,
         children,
         className,
-        snapbackThreshold,
-        maxSnapOvershootVelocity,
         autoTimerSeconds,
         navComponent,
         getActiveIndex,
@@ -32,7 +30,7 @@ const CarouselWrapper = (
     const rootRef = useRef(null);
     const carouselRef = useRef(null);
     const timerRef = useRef(null);
-    const visibleItems = useRef();
+    const visibleItems = useRef(1);
     const [index, setIndex] = useState(0);
     const [inView, setInView] = useState(0);
     const [timerPaused, setTimerPaused] = useState(false);
@@ -171,9 +169,10 @@ const CarouselWrapper = (
     const handleResize = useCallback(() => {
         // get carousel-wrapper css vars
         const computed = getComputedStyle(rootRef.current);
-        visibleItems.current = parseFloat(
-            computed.getPropertyValue('--carousel-wrapper-visible-items')
+        const computedVI = computed.getPropertyValue(
+            '--carousel-wrapper-visible-items'
         );
+        visibleItems.current = computedVI || visibleItems.current;
 
         if (autoTimerSeconds) {
             if (inView && !timerPaused) {
@@ -221,8 +220,6 @@ const CarouselWrapper = (
                     activeItemIndex={activeItemIndex}
                     onActiveItemIndexChange={handleIndex}
                     onPointerInteraction={handlePointerInteraction}
-                    snapbackThreshold={snapbackThreshold}
-                    maxSnapOvershootVelocity={maxSnapOvershootVelocity}
                     className={className}
                     style={style}
                 >
