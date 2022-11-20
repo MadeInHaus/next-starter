@@ -20,17 +20,17 @@ const Landing = () => {
             <ul>
                 <li>
                     <Link href="/demos/image-loader">
-                        <Text as="a">UseImageLoader</Text>
+                        <Text as="span">UseImageLoader</Text>
                     </Link>
                 </li>
                 <li>
                     <Link href="/demos/intersection-observer">
-                        <Text as="a">UseIntersectionObserver</Text>
+                        <Text as="span">UseIntersectionObserver</Text>
                     </Link>
                 </li>
                 <li>
                     <Link href="/demos/intersection-observer#anchor">
-                        <Text as="a">UseIntersectionObserver (anchor)</Text>
+                        <Text as="span">UseIntersectionObserver (anchor)</Text>
                     </Link>
                 </li>
             </ul>

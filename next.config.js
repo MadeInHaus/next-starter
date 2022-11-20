@@ -27,8 +27,6 @@ const securityHeaders = [
 
 module.exports = {
     poweredByHeader: false,
-    webpack5: true,
-    swcMinify: true,
     async headers() {
         return [
             {
