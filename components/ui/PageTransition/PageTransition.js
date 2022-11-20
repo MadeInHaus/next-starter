@@ -123,6 +123,12 @@ const PageTransition = forwardRef(({ as, className, children }, ref) => {
         };
 
         const transitionIn = () => {
+            clearTimeout(timeout.current);
+            timeout.current = setTimeout(handleInComplete, FADE_IN_DURATION);
+            updateState({ phase: PHASE_IN });
+        };
+
+        const restoreScroll = () => {
             if (scrollPos.current?.hash) {
                 const el = document.querySelector(scrollPos.current.hash);
                 const style = window.getComputedStyle(el);
@@ -135,9 +141,6 @@ const PageTransition = forwardRef(({ as, className, children }, ref) => {
                 const { x, y } = scrollPos.current ?? { x: 0, y: 0 };
                 window.scrollTo(x, y);
             }
-            clearTimeout(timeout.current);
-            timeout.current = setTimeout(handleInComplete, FADE_IN_DURATION);
-            updateState({ phase: PHASE_IN });
         };
 
         switch (phase) {
@@ -157,8 +160,12 @@ const PageTransition = forwardRef(({ as, className, children }, ref) => {
                     if (children.key !== currentChild.key) {
                         transitionOut(children);
                     } else {
+                        // Here we swap the children
                         setCurrentChild(children);
                     }
+                } else {
+                    // TODO: handle anchors on initial load
+                    restoreScroll();
                 }
                 break;
         }
