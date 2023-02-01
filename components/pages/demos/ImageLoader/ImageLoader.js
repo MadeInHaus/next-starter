@@ -1,32 +1,29 @@
+import * as React from 'react';
 import cx from 'classnames';
-
-import { mappable } from 'utils';
 
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
 import useImageLoader from 'hooks/useImageLoader';
 
 import styles from './ImageLoader.module.scss';
 
-const ImageLoader = () => {
+const ImageLoader = ({ dogs }) => {
     return (
         <div className={styles.root}>
-            {mappable(10).map(i => (
-                <LazyImage key={i} />
+            {dogs.map((dog, i) => (
+                <LazyImage key={i} url={dog} />
             ))}
         </div>
     );
 };
 
-const LazyImage = () => {
+const LazyImage = ({ url }) => {
     const [inView, intersectionRef] = useIntersectionObserver();
     const [loaded, loadRef] = useImageLoader();
     return (
-        <div ref={intersectionRef}>
+        <div ref={intersectionRef} className={styles.imageWrapper}>
             <img
                 ref={loadRef}
-                width={640}
-                height={480}
-                src={inView ? 'http://placeimg.com/640/480/animals' : null}
+                src={inView ? url : null}
                 className={cx(styles.image, { [styles.loaded]: loaded })}
                 alt=""
             />

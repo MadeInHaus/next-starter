@@ -5,8 +5,17 @@
     padding: 2rem;
 }
 
+.imageWrapper {
+    width: fit-content;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 .image {
     display: block;
+    width: 64rem;
+    height: 48rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    object-fit: cover;
     opacity: 0;
 
     &.loaded {
