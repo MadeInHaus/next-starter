@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 
 export const PHASE_APPEAR = 'appear';
 export const PHASE_IN = 'in';

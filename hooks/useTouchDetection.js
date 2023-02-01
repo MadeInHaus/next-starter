@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import create from 'zustand';
+import { create } from 'zustand';
 
 const useStore = create(set => ({
     isTouch: false,
@@ -8,7 +8,7 @@ const useStore = create(set => ({
 
 export const useIsTouch = () => {
     return useStore(state => state.isTouch);
-}
+};
 
 const useTouchDetection = () => {
     const setIsTouch = useStore(state => state.setIsTouch);
