@@ -2,8 +2,7 @@
 
 :root {
     --grid-margin: 10px;
-    --grid-padding: 15px;
-    --grid-gap: 5px;
+    --grid-gap: 10px;
     --grid-columns: 6;
 
     --grid-content-width: calc(100vw - var(--grid-margin) * 2);
@@ -15,14 +14,12 @@
 @include medium {
     :root {
         --grid-margin: 50px;
-        --grid-padding: 45px;
         --grid-gap: 20px;
     }
 }
 
 @include large {
     :root {
-        --grid-padding: 50px;
         --grid-columns: 12;
     }
 }
@@ -30,6 +27,5 @@
 @include xlarge {
     :root {
         --grid-margin: 100px;
-        --grid-padding: 75px;
     }
 }
