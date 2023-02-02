@@ -1,8 +1,7 @@
 import * as React from 'react';
 import cx from 'classnames';
 
-import useIntersectionObserver from 'hooks/useIntersectionObserver';
-import useImageLoader from 'hooks/useImageLoader';
+import { useIntersectionObserver, useImagePreload } from '@madeinhaus/core';
 
 import styles from './ImageLoader.module.scss';
 
@@ -18,7 +17,7 @@ const ImageLoader = ({ dogs }) => {
 
 const LazyImage = ({ url }) => {
     const [inView, intersectionRef] = useIntersectionObserver();
-    const [loaded, loadRef] = useImageLoader();
+    const [loaded, loadRef] = useImagePreload();
     return (
         <div ref={intersectionRef} className={styles.imageWrapper}>
             <img

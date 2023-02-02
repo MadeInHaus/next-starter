@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import Text from 'components/ui/Text';
 
-import useIntersectionObserver from 'hooks/useIntersectionObserver';
+import { useIntersectionObserver } from '@madeinhaus/core';
 
 import styles from './IntersectionObserver.module.scss';
 
