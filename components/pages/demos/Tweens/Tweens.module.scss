@@ -1,0 +1,18 @@
+@import 'styles/breakpoints';
+@import 'styles/fonts';
+
+.root {
+    padding: 2rem;
+}
+
+.graph {
+    width: 50rem;
+    height: 50rem;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.slider {
+    width: 50rem;
+    height: 10rem;
+    background-color: rgba(0, 0, 0, 0.05);
+}

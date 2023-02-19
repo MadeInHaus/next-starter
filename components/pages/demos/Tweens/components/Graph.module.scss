@@ -1,0 +1,38 @@
+@import 'styles/breakpoints';
+@import 'styles/fonts';
+
+.svg {
+    display: block;
+    fill: none;
+    stroke: #000;
+    stroke-width: 1px;
+
+    circle,
+    line,
+    polygon,
+    path,
+    text {
+        vector-effect: non-scaling-stroke;
+    }
+}
+
+.bezier {
+    stroke: #0000ff;
+    stroke-width: 3px;
+}
+
+.bezierHull {
+    stroke: #00bb00;
+    stroke-width: 3px;
+}
+
+.controlPoint {
+    fill: white;
+    stroke: #00bb00;
+    stroke-width: 3px;
+    cursor: grab;
+}
+
+.gridLines {
+    stroke: #ccc;
+}

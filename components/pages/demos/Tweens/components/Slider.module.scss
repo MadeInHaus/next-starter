@@ -1,0 +1,14 @@
+.svg {
+    display: block;
+    fill: none;
+    stroke: #000;
+    stroke-width: 1px;
+
+    circle,
+    line,
+    polygon,
+    path,
+    text {
+        vector-effect: non-scaling-stroke;
+    }
+}

@@ -38,6 +38,11 @@ const Landing = () => {
                         <Text as="span">UseIntersectionObserver (anchor)</Text>
                     </Link>
                 </li>
+                <li>
+                    <Link href="/demos/tweens">
+                        <Text as="span">Tweens</Text>
+                    </Link>
+                </li>
             </ul>
         </div>
     );
