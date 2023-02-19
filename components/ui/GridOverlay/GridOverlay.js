@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import cx from 'classnames';
+import cx from 'clsx';
 
 import Portal from 'components/misc/Portal';
 

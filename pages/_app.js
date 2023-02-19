@@ -8,7 +8,7 @@ import 'styles/global/colors.scss';
 import 'styles/global/animations.scss';
 import 'styles/global/misc.scss';
 
-import cx from 'classnames';
+import cx from 'clsx';
 import { useRouter } from 'next/router';
 import { removeHash } from 'utils';
 

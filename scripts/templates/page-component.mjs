@@ -4,7 +4,8 @@ export const pageComponentRoute = name => {
 };
 
 export const pageComponentJS = name => {
-    return `// import PropTypes from 'prop-types';
+    return `import * as React from 'react';
+// import PropTypes from 'prop-types';
 
 import styles from './${name}.module.scss';
 

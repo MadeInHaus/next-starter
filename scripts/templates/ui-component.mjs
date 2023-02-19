@@ -1,5 +1,6 @@
-export const uiComponentJS = name => `import PropTypes from 'prop-types';
-import cx from 'classnames';
+export const uiComponentJS = name => `import * as React from 'react';
+import PropTypes from 'prop-types';
+import cx from 'clsx';
 
 import styles from './${name}.module.scss';
 
