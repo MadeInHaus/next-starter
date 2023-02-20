@@ -1,0 +1,21 @@
+:root[data-theme='light'] {
+    --text-color: #111;
+    --background-color: #fff;
+    --surface-color: #eee;
+    --surface-color-hover: #fff;
+    --border-color: #666;
+}
+
+:root[data-theme='dark'] {
+    --text-color: #ddd;
+    --background-color: #111;
+    --surface-color: #222;
+    --surface-color-hover: #333;
+    --border-color: #aaa;
+}
+
+body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+    transition: color 0.15s linear, background-color 0.15s linear;
+}

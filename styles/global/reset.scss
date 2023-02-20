@@ -6,12 +6,6 @@ html {
     touch-action: manipulation;
 }
 
-html,
-body,
-#__next {
-    height: 100%;
-}
-
 #__next {
   isolation: isolate;
 }

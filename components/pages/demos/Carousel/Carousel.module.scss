@@ -14,7 +14,7 @@
     position: relative;
     width: var(--image-size);
     height: var(--image-size);
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--surface-color);
 }
 
 .image {

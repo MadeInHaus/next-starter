@@ -19,6 +19,7 @@ import { useTransitionState } from 'hooks/usePageTransitionStore';
 
 import NextHead from 'next/head';
 
+import { ThemeProvider } from 'components/misc/Theme';
 import PageTransition from 'components/ui/PageTransition';
 import GridOverlay from 'components/ui/GridOverlay';
 
@@ -53,10 +54,12 @@ function App({ Component, pageProps }) {
     return (
         <>
             <Head />
-            <PageTransition className={transitionClass}>
-                <Component {...pageProps} key={removeHash(router.asPath)} />
-            </PageTransition>
-            <GridOverlay />
+            <ThemeProvider>
+                <PageTransition className={transitionClass}>
+                    <Component {...pageProps} key={removeHash(router.asPath)} />
+                </PageTransition>
+                <GridOverlay />
+            </ThemeProvider>
         </>
     );
 }
