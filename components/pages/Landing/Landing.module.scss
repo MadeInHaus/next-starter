@@ -9,11 +9,15 @@
 
     .sectionHeadline {
         margin-bottom: 1rem;
-
     }
 }
 
-.themeButton[disabled] {
-    opacity: 0.4;
-    cursor: default;
+.themeButton {
+    text-decoration: underline;
+
+    &[disabled] {
+        opacity: 0.4;
+        cursor: default;
+        text-decoration: none;
+    }
 }

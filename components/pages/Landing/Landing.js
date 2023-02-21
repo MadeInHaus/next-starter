@@ -53,33 +53,17 @@ const Landing = () => {
                     Theming
                 </Text>
                 <ul>
-                    <li>
-                        <button
-                            onClick={handleThemeClick('auto')}
-                            disabled={theme === 'auto'}
-                            className={styles.themeButton}
-                        >
-                            auto
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            onClick={handleThemeClick('light')}
-                            disabled={theme === 'light'}
-                            className={styles.themeButton}
-                        >
-                            light
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            onClick={handleThemeClick('dark')}
-                            disabled={theme === 'dark'}
-                            className={styles.themeButton}
-                        >
-                            dark
-                        </button>
-                    </li>
+                    {['auto', 'light', 'dark'].map(t => (
+                        <li key={t}>
+                            <button
+                                onClick={handleThemeClick(t)}
+                                disabled={t === theme}
+                                className={styles.themeButton}
+                            >
+                                {t}
+                            </button>
+                        </li>
+                    ))}
                 </ul>
             </section>
         </div>
