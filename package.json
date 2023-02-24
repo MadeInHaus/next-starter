@@ -2,6 +2,11 @@
   "name": "next-starter",
   "description": "A skeleton Next.js app to quickly get started.",
   "version": "1.1.0",
+  "author": "Haus",
+  "engines": {
+    "node": "^16",
+    "npm": "^8"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
