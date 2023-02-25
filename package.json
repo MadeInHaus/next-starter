@@ -8,7 +8,7 @@
     "npm": "^8"
   },
   "scripts": {
-    "set-node-version": "source ~/.nvm/nvm.sh && nvm use || echo 'nvm not installed'",
+    "set-node-version": "if [ -f ~/.nvm/nvm.sh ]; then source ~/.nvm/nvm.sh && nvm use; else echo 'nvm not installed, skipping'; fi",
     "preinstall": "npm run set-node-version",
     "dev": "next dev",
     "build": "next build",
