@@ -16,7 +16,11 @@ const run = async () => {
         // Run nvm use
         sh.exec('nvm use');
     } else {
-        console.log(chalk.red.bold('nvm is not installed!'));
+        console.log(
+            chalk.red.bold(
+                'nvm is not installed! Please install it: https://github.com/nvm-sh/nvm#installing-and-updating '
+            )
+        );
     }
 };
 
