@@ -3,10 +3,6 @@
   "description": "A skeleton Next.js app to quickly get started.",
   "version": "1.1.0",
   "author": "Haus",
-  "engines": {
-    "node": "^16",
-    "npm": "^8"
-  },
   "scripts": {
     "nvm": "node scripts/nvm.mjs",
     "preinstall": "npm run nvm",

@@ -10,10 +10,10 @@ const run = async () => {
         )
     );
 
-    // Check for existence of NVM
+    // Check for existence of nvm
     if (sh.exec('nvm')) {
         console.log(chalk.green.bold('nvm is installed!'));
-        // Run nvm use
+        // Run `nvm use`
         sh.exec('nvm use');
     } else {
         console.log(
