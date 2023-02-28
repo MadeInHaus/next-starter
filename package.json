@@ -2,7 +2,12 @@
   "name": "next-starter",
   "description": "A skeleton Next.js app to quickly get started.",
   "version": "1.1.0",
+  "author": "Haus",
+  "engines": {
+    "node": "^16"
+  },
   "scripts": {
+    "preinstall": "node scripts/check-node-version.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -29,6 +34,7 @@
     "figlet": "1.5.2",
     "inquirer": "9.1.4",
     "prettier": "2.8.4",
+    "semver": "^7.3.8",
     "shelljs": "0.8.5",
     "stylelint": "15.1.0"
   }
