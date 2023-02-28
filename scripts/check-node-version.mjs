@@ -12,7 +12,6 @@ const requiredNodeVersionWholeNumber = Math.floor(
 const currentVersionWholeNumber = Math.floor(parseFloat(currentVersion));
 
 if (!requiredNodeVersion) {
-    // Create a space before and after this console log to make it stand out
     console.warn(
         chalk.yellow.bold(
             '\nNo Node version specified in package.json. For more info, please visit https://docs.npmjs.com/cli/v8/configuring-npm/package-json#engines\n'
