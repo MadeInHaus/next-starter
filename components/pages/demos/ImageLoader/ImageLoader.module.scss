@@ -1,13 +1,17 @@
 .root {
+    padding: 3rem 0;
+}
+
+.dogs {
+    grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    padding: 2rem;
 }
 
 .imageWrapper {
     width: fit-content;
-    background-color: var(--surface-color);
+    background-color: var(--surface-color-2);
 }
 
 .image {
@@ -15,15 +19,10 @@
     width: 64rem;
     height: 48rem;
     object-fit: cover;
-    opacity: 0;
+    opacity: 0.001;
+    transition: opacity 0.5s linear;
 
     &.loaded {
-        animation: fadeIn 1s linear forwards;
-    }
-}
-
-@keyframes fadeIn {
-    100% {
         opacity: 1;
     }
 }

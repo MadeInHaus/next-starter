@@ -1,20 +1,30 @@
-import { useTheme } from 'components/misc/Theme';
+import cx from 'clsx';
 
+import { useTheme } from 'components/misc/Theme';
+import { Link } from '@madeinhaus/nextjs-page-transition';
 import Head from 'components/misc/Head';
-import Link from 'components/ui/Link';
 import Text from 'components/ui/Text';
 
+import grid from 'styles/modules/grid.module.scss';
 import styles from './Landing.module.scss';
 
+// prettier-ignore
+const demoLinks = [
+    { href: '/demos/carousel', label: 'Carousel' },
+    { href: '/demos/image-loader', label: 'UseImageLoader' },
+    { href: '/demos/intersection-observer', label: 'UseIntersectionObserver' },
+    { href: '/demos/intersection-observer#anchor', label: 'UseIntersectionObserver (anchor)' },
+];
+
 const Landing = () => {
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme } = useTheme() ?? {};
 
     const handleThemeClick = theme => () => {
-        setTheme(theme);
+        setTheme?.(theme);
     };
 
     return (
-        <div className={styles.root}>
+        <div className={cx(styles.root, grid.container)}>
             <Head
                 title="HAUS Next.js Starter"
                 description="A skeleton Next.js app to quickly get started."
@@ -23,44 +33,29 @@ const Landing = () => {
                 <Text as="h2" className={styles.sectionHeadline}>
                     Demos
                 </Text>
-                <ul>
-                    <li>
-                        <Link href="/demos/carousel">
-                            <Text as="span">Carousel</Text>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/demos/image-loader">
-                            <Text as="span">useImageLoader</Text>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/demos/intersection-observer">
-                            <Text as="span">useIntersectionObserver</Text>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/demos/intersection-observer#anchor">
-                            <Text as="span">
-                                useIntersectionObserver (anchor)
-                            </Text>
-                        </Link>
-                    </li>
+                <ul className={styles.links}>
+                    {demoLinks.map(({ href, label }, i) => (
+                        <li key={i} className={styles.link}>
+                            <Link href={href}>
+                                <Text as="span">{label}</Text>
+                            </Link>
+                        </li>
+                    ))}
                 </ul>
             </section>
             <section className={styles.section}>
                 <Text as="h2" className={styles.sectionHeadline}>
-                    Theming
+                    Theme
                 </Text>
                 <ul>
-                    {['auto', 'light', 'dark'].map(t => (
-                        <li key={t}>
+                    {['auto', 'light', 'dark'].map(themeValue => (
+                        <li key={themeValue}>
                             <button
-                                onClick={handleThemeClick(t)}
-                                disabled={t === theme}
+                                onClick={handleThemeClick(themeValue)}
+                                disabled={themeValue === theme}
                                 className={styles.themeButton}
                             >
-                                {t}
+                                {themeValue}
                             </button>
                         </li>
                     ))}

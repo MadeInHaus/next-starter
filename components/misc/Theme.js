@@ -1,19 +1,19 @@
 import * as React from 'react';
 
-const LOCALSTORAGE_KEY = 'theme';
-
 const DARK = 'dark';
 const LIGHT = 'light';
 const AUTO = 'auto';
 
-const defaultTheme = AUTO;
 const themes = [AUTO, DARK, LIGHT];
+const defaultTheme = AUTO;
 const systemThemeMap = { auto: AUTO, dark: DARK, light: LIGHT };
 const defaultThemesDef = { themes, systemThemeMap, defaultTheme };
 
-const ThemeContext = React.createContext();
+const ThemeContext = React.createContext(null);
 
 export const ThemeProvider = ({ themesDef = defaultThemesDef, children }) => {
+    const localStorageKey = themesDef.localStorageKey ?? 'theme';
+
     const [{ theme, themeValue }, setThemeInternal] = React.useState({
         theme: null,
         themeValue: null,
@@ -49,15 +49,15 @@ export const ThemeProvider = ({ themesDef = defaultThemesDef, children }) => {
 
     const setTheme = React.useCallback(
         theme => {
-            localStorage.setItem(LOCALSTORAGE_KEY, theme);
+            localStorage.setItem(localStorageKey, theme);
             applyTheme(theme);
         },
-        [applyTheme]
+        [localStorageKey, applyTheme]
     );
 
     React.useEffect(() => {
         const mql = window.matchMedia('(prefers-color-scheme: dark)');
-        const saved = window.localStorage.getItem(LOCALSTORAGE_KEY);
+        const saved = window.localStorage.getItem(localStorageKey);
         const themeNew = saved ?? themesDef.defaultTheme;
         const themeValueNew = getThemeValue(themeNew, mql.matches);
         if (themeNew !== theme || themeValueNew !== themeValue) {
@@ -68,7 +68,14 @@ export const ThemeProvider = ({ themesDef = defaultThemesDef, children }) => {
         };
         mql.addEventListener('change', handleChange);
         return () => mql.removeEventListener('change', handleChange);
-    }, [theme, themeValue, themesDef, getThemeValue, applyTheme]);
+    }, [
+        theme,
+        themeValue,
+        localStorageKey,
+        themesDef,
+        getThemeValue,
+        applyTheme,
+    ]);
 
     return (
         <ThemeContext.Provider value={{ theme, themeValue, setTheme }}>
@@ -80,11 +87,12 @@ export const ThemeProvider = ({ themesDef = defaultThemesDef, children }) => {
 export const useTheme = () => React.useContext(ThemeContext);
 
 export const ThemeScript = ({ themesDef = defaultThemesDef }) => {
+    const localStorageKey = themesDef.localStorageKey ?? 'theme';
     const themeScript = `
         (function() {
             const themesDef = ${JSON.stringify(themesDef)};
             function getThemeValue() {
-                const saved = window.localStorage.getItem('${LOCALSTORAGE_KEY}');
+                const saved = window.localStorage.getItem('${localStorageKey}');
                 const theme = saved ?? themesDef.defaultTheme;
                 if (theme === themesDef.systemThemeMap.auto) {
                     const mql = window.matchMedia('(prefers-color-scheme: dark)');

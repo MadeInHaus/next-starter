@@ -8,28 +8,18 @@ import 'styles/global/colors.scss';
 import 'styles/global/animations.scss';
 import 'styles/global/misc.scss';
 
-import cx from 'clsx';
-import { useRouter } from 'next/router';
-import { removeHash } from 'utils';
-
-import useNextCssRemovalPrevention from 'hooks/useNextCssRemovalPrevention';
-import useTouchDetection from 'hooks/useTouchDetection';
-import useFontLoader from 'hooks/useFontLoader';
-import { useTransitionState } from 'hooks/usePageTransitionStore';
-
 import NextHead from 'next/head';
-
-import { ThemeProvider } from 'components/misc/Theme';
-import PageTransition from 'components/ui/PageTransition';
+import Header from 'components/ui/Header';
 import GridOverlay from 'components/ui/GridOverlay';
 
-import styles from 'styles/modules/app.module.scss';
+import { ThemeProvider } from 'components/misc/Theme';
 
-const fontFamilies = [
-    'neue-haas-grotesk-display:n7',
-    'neue-haas-grotesk-text:n4,n5,n7',
-    'interstate-mono:n4',
-];
+import PageTransition, {
+    PageTransitionContext,
+    useAsPathWithoutHash,
+} from '@madeinhaus/nextjs-page-transition';
+
+import styles from 'styles/modules/app.module.scss';
 
 // prettier-ignore
 const Head = () => (
@@ -42,25 +32,17 @@ const Head = () => (
 );
 
 function App({ Component, pageProps }) {
-    const router = useRouter();
-
-    useNextCssRemovalPrevention();
-    useFontLoader(fontFamilies);
-    useTouchDetection();
-
-    const { phase } = useTransitionState();
-    const transitionClass = cx(styles.main, styles[`transition-${phase}`]);
-
     return (
-        <>
+        <ThemeProvider>
             <Head />
-            <ThemeProvider>
-                <PageTransition className={transitionClass}>
-                    <Component {...pageProps} key={removeHash(router.asPath)} />
+            <PageTransitionContext>
+                <Header />
+                <PageTransition className={styles.main}>
+                    <Component {...pageProps} key={useAsPathWithoutHash()} />
                 </PageTransition>
                 <GridOverlay />
-            </ThemeProvider>
-        </>
+            </PageTransitionContext>
+        </ThemeProvider>
     );
 }
 

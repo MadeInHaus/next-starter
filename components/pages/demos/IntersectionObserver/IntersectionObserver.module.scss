@@ -1,25 +1,35 @@
 .root {
-    padding: 2rem;
+    padding: 3rem 0;
 }
 
-.button {
-    padding: 0.5rem 1rem;
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-
-    &:hover {
-        background-color: var(--surface-color-hover);
-    }
+.header,
+.intersectingElement {
+    grid-column: 1 / -1;
 }
 
-.header {
+.controls {
     position: fixed;
-    top: 2rem;
-    left: 2rem;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    padding: 0 var(--grid-margin);
     display: flex;
     align-items: center;
     gap: 2rem;
+    border-bottom: 1px solid var(--border-color-2);
+    background-color: var(--surface-color-2);
+
+    .button {
+        padding: 0.5rem 1rem;
+        background-color: var(--surface-color-1);
+        border: 1px solid var(--border-color-1);
+        border-radius: 0.5rem;
+
+        &:hover {
+            background-color: var(--surface-color-1-hover);
+        }
+    }
 }
 
 .intersectingElement {

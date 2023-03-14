@@ -1,0 +1,50 @@
+@import 'styles/breakpoints';
+
+.root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    border-bottom: 1px solid var(--border-color-1);
+    background-color: var(--surface-color-1);
+    transition: border-bottom 0.15s linear, background-color 0.15s linear;
+    z-index: 1;
+}
+
+.container {
+    position: absolute;
+    inset: 0;
+    align-items: center;
+}
+
+.home {
+    grid-column: 1 / span 4;
+    text-underline-offset: 0.4rem;
+}
+
+.phase {
+    grid-column: 5 / span 2;
+    justify-self: end;
+    text-align: end;
+}
+
+.phasePrefix {
+    display: none;
+}
+
+@include medium {
+    .phasePrefix {
+        display: inline;
+    }
+}
+
+@include large {
+    .home {
+        grid-column: 1 / span 6;
+    }
+
+    .phase {
+        grid-column: 7 / span 6;
+    }
+}

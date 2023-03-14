@@ -1,23 +1,40 @@
 .root {
-    padding: 2rem;
+    padding: 3rem 0;
 }
 
 .section {
-    &:not(:first-of-type) {
-        margin-top: 2rem;
-    }
+    grid-column: 1 / -1;
 
-    .sectionHeadline {
-        margin-bottom: 1rem;
+    &:not(:first-of-type) {
+        margin-top: 3rem;
     }
 }
 
+.sectionHeadline {
+    margin-bottom: 1rem;
+    font-size: 1.4em;
+}
+
 .themeButton {
-    text-decoration: underline;
+    display: block;
+    text-decoration: none;
+    padding: 0.5rem 0;
 
     &[disabled] {
         opacity: 0.4;
         cursor: default;
-        text-decoration: none;
+    }
+}
+
+.link {
+    padding: 0.5rem 0;
+
+    &:first-of-type {
+        padding-top: 0;
+    }
+
+    > a {
+        text-decoration-color: #888;
+        text-underline-offset: 0.4rem;
     }
 }
