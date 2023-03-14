@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import cx from 'clsx';
 
 import Portal from '@madeinhaus/portal';
@@ -7,10 +7,10 @@ import grid from 'styles/modules/grid.module.scss';
 import styles from './GridOverlay.module.scss';
 
 const GridOverlay = () => {
-    const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = React.useState(false);
     const isProduction = process.env.NODE_ENV === 'production';
 
-    useEffect(() => {
+    React.useEffect(() => {
         const handleKey = event => {
             if (
                 !isProduction &&
