@@ -1,5 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document';
-import { ThemeScript } from 'components/misc/Theme';
+import { ThemeScript } from '@madeinhaus/nextjs-theme';
 
 class MyDocument extends Document {
     render() {

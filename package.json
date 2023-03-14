@@ -21,6 +21,7 @@
     "@madeinhaus/carousel": "^1.1.0",
     "@madeinhaus/hooks": "^1.0.1",
     "@madeinhaus/nextjs-page-transition": "^1.2.1",
+    "@madeinhaus/nextjs-theme": "^1.0.2",
     "@madeinhaus/portal": "^1.1.0",
     "@madeinhaus/utils": "^1.0.0",
     "clsx": "^1.2.1",

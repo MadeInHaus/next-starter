@@ -12,7 +12,7 @@ import NextHead from 'next/head';
 import Header from 'components/ui/Header';
 import GridOverlay from 'components/ui/GridOverlay';
 
-import { ThemeProvider } from 'components/misc/Theme';
+import { ThemeProvider } from '@madeinhaus/nextjs-theme';
 
 import PageTransition, {
     PageTransitionContext,

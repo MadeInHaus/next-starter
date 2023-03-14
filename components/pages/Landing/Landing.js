@@ -1,6 +1,6 @@
 import cx from 'clsx';
 
-import { useTheme } from 'components/misc/Theme';
+import { useTheme } from '@madeinhaus/nextjs-theme';
 import { Link } from '@madeinhaus/nextjs-page-transition';
 import Head from 'components/misc/Head';
 import Text from 'components/ui/Text';
