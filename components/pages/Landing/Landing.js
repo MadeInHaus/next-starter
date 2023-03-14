@@ -61,6 +61,20 @@ const Landing = () => {
                     ))}
                 </ul>
             </section>
+            <section className={styles.section}>
+                <Text as="h2" className={styles.sectionHeadline}>
+                    Source
+                </Text>
+                <ul>
+                    <li className={styles.link}>
+                        <Link href="https://github.com/MadeInHaus/next-starter">
+                            <Text as="span">
+                                https://github.com/MadeInHaus/next-starter
+                            </Text>
+                        </Link>
+                    </li>
+                </ul>
+            </section>
         </div>
     );
 };
