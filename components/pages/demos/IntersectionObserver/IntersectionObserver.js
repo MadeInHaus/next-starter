@@ -14,14 +14,27 @@ const IntersectionObserver = () => {
     return (
         <div className={styles.root}>
             <div className={styles.controls}>
-                <Text as="button" className={styles.button} onClick={() => setOnce(!once)}>
+                <Text
+                    as="button"
+                    className={styles.button}
+                    onClick={() => setOnce(!once)}
+                >
                     {`Toggle 'once' ${once ? 'OFF' : 'ON'}`}
                 </Text>
                 <Text>{`once: ${once ? 'ON' : 'OFF'}`}</Text>
                 <Text>{`inView: ${inView ? 'YES' : 'NO'}`}</Text>
             </div>
-            <div className={cx(styles.intersectingElementContainer, grid.container)}>
-                <div ref={ref} id="anchor" className={styles.intersectingElement} />
+            <div
+                className={cx(
+                    styles.intersectingElementContainer,
+                    grid.container
+                )}
+            >
+                <div
+                    ref={ref}
+                    id="anchor"
+                    className={styles.intersectingElement}
+                />
             </div>
         </div>
     );

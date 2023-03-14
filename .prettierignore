@@ -1,4 +1,8 @@
 package-lock.json
 package.json
-public/
+README.md
+.next
+.vscode
+node_modules
+public
 pages/_document.js
