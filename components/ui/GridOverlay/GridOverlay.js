@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import cx from 'clsx';
 
-import Portal from '@madeinhaus/Portal';
+import Portal from '@madeinhaus/portal';
 
 import grid from 'styles/modules/grid.module.scss';
 import styles from './GridOverlay.module.scss';
