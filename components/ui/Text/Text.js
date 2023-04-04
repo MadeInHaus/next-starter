@@ -5,7 +5,13 @@ import cx from 'clsx';
 import styles from './Text.module.scss';
 
 const Text = React.forwardRef((props, ref) => {
-    const { as, theme, className, children, ...otherProps } = props;
+    const {
+        as = 'p',
+        theme = 'body',
+        className,
+        children,
+        ...otherProps
+    } = props;
     return React.createElement(
         as,
         { ref, className: cx(styles[theme], className), ...otherProps },
@@ -18,11 +24,6 @@ Text.propTypes = {
     theme: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,
-};
-
-Text.defaultProps = {
-    theme: 'body',
-    as: 'p',
 };
 
 export default Text;
