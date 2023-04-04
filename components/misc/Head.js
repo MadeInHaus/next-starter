@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 
-const PageHead = ({ title, description, image, url, preloads }) => {
+const PageHead = ({ title, description, image, url, preloads = [] }) => {
     return (
         // prettier-ignore
         <Head>
@@ -37,10 +37,6 @@ PageHead.propTypes = {
             crossOrigin: PropTypes.string,
         })
     ),
-};
-
-PageHead.defaultProps = {
-    preloads: [],
 };
 
 export default PageHead;

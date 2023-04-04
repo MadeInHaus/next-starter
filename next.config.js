@@ -27,6 +27,9 @@ const securityHeaders = [
 
 module.exports = {
     poweredByHeader: false,
+    experimental: {
+        appDir: true,
+    },
     async headers() {
         return [
             {

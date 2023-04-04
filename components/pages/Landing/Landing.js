@@ -1,3 +1,5 @@
+'use client';
+
 import cx from 'clsx';
 
 import { useTheme } from '@madeinhaus/nextjs-theme';
@@ -18,6 +20,8 @@ const demoLinks = [
 
 const Landing = () => {
     const { theme, setTheme } = useTheme() ?? {};
+
+    console.log('theme', theme);
 
     const handleThemeClick = theme => () => {
         setTheme?.(theme);
