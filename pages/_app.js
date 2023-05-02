@@ -32,13 +32,14 @@ const Head = () => (
 );
 
 function App({ Component, pageProps }) {
+    const key = useAsPathWithoutHash();
     return (
         <ThemeProvider>
             <Head />
             <PageTransitionContext>
                 <Header />
                 <PageTransition className={styles.main}>
-                    <Component {...pageProps} key={useAsPathWithoutHash()} />
+                    <Component {...pageProps} key={key} />
                 </PageTransition>
                 <GridOverlay />
             </PageTransitionContext>
