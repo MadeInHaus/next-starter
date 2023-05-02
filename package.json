@@ -18,29 +18,29 @@
     "prettier-fix": "prettier -w ."
   },
   "dependencies": {
-    "@madeinhaus/carousel": "^1.1.0",
+    "@madeinhaus/carousel": "^1.1.1",
     "@madeinhaus/hooks": "^1.0.1",
-    "@madeinhaus/nextjs-page-transition": "^1.2.1",
+    "@madeinhaus/nextjs-page-transition": "^1.2.4",
     "@madeinhaus/nextjs-theme": "^1.0.2",
     "@madeinhaus/portal": "^1.1.0",
-    "@madeinhaus/utils": "^1.0.0",
+    "@madeinhaus/utils": "^1.1.1",
     "clsx": "^1.2.1",
-    "next": "13.2.4",
+    "next": "13.3.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "sass": "1.59.2",
-    "zustand": "4.3.6"
+    "sass": "1.62.1",
+    "zustand": "4.3.7"
   },
   "devDependencies": {
     "@madeinhaus/prettier-config": "1.2.1",
     "chalk": "5.2.0",
-    "eslint": "8.36.0",
-    "eslint-config-next": "13.2.4",
-    "figlet": "1.5.2",
-    "inquirer": "9.1.4",
-    "prettier": "2.8.4",
-    "semver": "^7.3.8",
+    "eslint": "8.39.0",
+    "eslint-config-next": "13.3.4",
+    "figlet": "1.6.0",
+    "inquirer": "9.2.0",
+    "prettier": "2.8.8",
+    "semver": "^7.5.0",
     "shelljs": "0.8.5",
-    "stylelint": "15.2.0"
+    "stylelint": "15.6.0"
   }
 }
