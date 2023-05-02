@@ -20,7 +20,7 @@
   "dependencies": {
     "@madeinhaus/carousel": "^1.1.1",
     "@madeinhaus/hooks": "^1.0.1",
-    "@madeinhaus/nextjs-page-transition": "^1.2.4",
+    "@madeinhaus/nextjs-page-transition": "^2.0.0",
     "@madeinhaus/nextjs-theme": "^1.0.2",
     "@madeinhaus/portal": "^1.1.0",
     "@madeinhaus/utils": "^1.1.1",
