@@ -6,6 +6,7 @@ html {
     touch-action: manipulation;
 }
 
+/* stylelint-disable-next-line selector-id-pattern */
 #__next {
     isolation: isolate;
 }
@@ -69,7 +70,7 @@ ol {
 button {
     padding: 0;
     border: none;
-    color: currentColor;
+    color: currentcolor;
     background-color: inherit;
     user-select: none;
     cursor: pointer;

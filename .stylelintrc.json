@@ -1,12 +1,40 @@
 {
+    "extends": ["stylelint-config-standard-scss", "stylelint-css-modules"],
     "rules": {
+        "scss/double-slash-comment-empty-line-before": null,
+        "at-rule-empty-line-before": null,
+        "declaration-empty-line-before": null,
+        "custom-property-empty-line-before": null,
+        "declaration-block-no-redundant-longhand-properties": null,
+        "alpha-value-notation": null,
+        "at-rule-no-vendor-prefix": true,
         "block-no-empty": null,
+        "color-function-notation": null,
         "color-no-hex": null,
         "color-no-invalid-hex": true,
-        "at-rule-no-vendor-prefix": true,
-        "declaration-colon-space-after": "always",
-        "max-empty-lines": 1,
-        "max-nesting-depth": 4,
+        "custom-property-pattern": null,
+        "declaration-colon-newline-after": null,
+        "font-family-name-quotes": "always-unless-keyword",
+        "keyframes-name-pattern": null,
+        "no-descending-specificity": null,
+        "max-nesting-depth": 3,
+        "scss/at-extend-no-missing-placeholder": null,
+        "scss/at-import-partial-extension": null,
+        "scss/at-mixin-pattern": null,
+        "scss/dollar-variable-pattern": null,
+        "scss/double-slash-comment-whitespace-inside": null,
+        "scss/no-global-function-names": null,
+        "scss/operator-no-newline-after": null,
+        "scss/operator-no-unspaced": null,
+        "scss/percent-placeholder-pattern": null,
+        "selector-class-pattern": null,
+        "value-list-comma-newline-after": null,
+        "comment-empty-line-before": [
+            "always",
+            {
+                "ignore": ["stylelint-commands", "after-comment"]
+            }
+        ],
         "rule-empty-line-before": [
             "always",
             {
@@ -14,49 +42,29 @@
                 "ignore": ["after-comment"]
             }
         ],
-        "comment-empty-line-before": [
-            "always",
+        "property-no-unknown": [
+            true,
             {
-                "ignore": ["stylelint-commands", "after-comment"]
+                "ignoreProperties": [
+                    "composes",
+                    "linear",
+                    "/ease/",
+                    "/fast/",
+                    "/slow/",
+                    "/duration/",
+                    "/width/",
+                    "/thickness/",
+                    "/desktop/",
+                    "/tablet/",
+                    "/default/"
+                ]
             }
         ],
-        "unit-case": "lower",
-        "unit-allowed-list": [
-            "em",
-            "ex",
-            "cap",
-            "ch",
-            "ic",
-            "rem",
-            "lh",
-            "rlh",
-            "vw",
-            "vh",
-            "vi",
-            "vb",
-            "vmin",
-            "vmax",
-            "cm",
-            "mm",
-            "Q",
-            "in",
-            "pc",
-            "pt",
-            "px",
-            "deg",
-            "grad",
-            "rad",
-            "turn",
-            "s",
-            "ms",
-            "Hz",
-            "kHz",
-            "dpi",
-            "dpcm",
-            "dppx",
-            "x",
-            "%",
-            "fr"
+        "selector-pseudo-class-no-unknown": [
+            true,
+            {
+                "ignorePseudoClasses": ["export", "import", "global", "local"]
+            }
         ]
     }
 }

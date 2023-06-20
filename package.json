@@ -11,36 +11,40 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && npm run prettier && npm run stylelint",
     "clean": "node scripts/clean.mjs",
     "scaffold": "node scripts/scaffold.mjs",
     "prettier": "prettier -c .",
-    "prettier-fix": "prettier -w ."
+    "prettier-fix": "prettier -w .",
+    "stylelint": "stylelint \"**/*.scss\"",
+    "stylelint-fix": "stylelint --fix \"**/*.css\""
   },
   "dependencies": {
-    "@madeinhaus/carousel": "^1.1.1",
-    "@madeinhaus/hooks": "^1.0.1",
-    "@madeinhaus/nextjs-page-transition": "^2.0.0",
-    "@madeinhaus/nextjs-theme": "^1.0.2",
-    "@madeinhaus/portal": "^1.1.0",
-    "@madeinhaus/utils": "^1.1.1",
+    "@madeinhaus/carousel": "^2.0.0",
+    "@madeinhaus/hooks": "^1.1.0",
+    "@madeinhaus/nextjs-page-transition": "^3.1.0",
+    "@madeinhaus/nextjs-theme": "^1.1.0",
+    "@madeinhaus/portal": "^1.2.0",
+    "@madeinhaus/utils": "^1.1.2",
     "clsx": "^1.2.1",
-    "next": "13.3.4",
+    "next": "13.4.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "sass": "1.62.1",
-    "zustand": "4.3.7"
+    "sass": "1.63.4",
+    "stylelint-config-standard-scss": "^9.0.0",
+    "stylelint-css-modules": "^1.2.2",
+    "zustand": "4.3.8"
   },
   "devDependencies": {
     "@madeinhaus/prettier-config": "1.2.1",
     "chalk": "5.2.0",
-    "eslint": "8.39.0",
-    "eslint-config-next": "13.3.4",
+    "eslint": "8.43.0",
+    "eslint-config-next": "13.4.6",
     "figlet": "1.6.0",
-    "inquirer": "9.2.0",
+    "inquirer": "9.2.7",
     "prettier": "2.8.8",
-    "semver": "^7.5.0",
+    "semver": "^7.5.2",
     "shelljs": "0.8.5",
-    "stylelint": "15.6.0"
+    "stylelint": "15.8.0"
   }
 }
