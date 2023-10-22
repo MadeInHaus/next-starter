@@ -7,9 +7,12 @@ import 'styles/global/grid.scss';
 import 'styles/global/colors.scss';
 import 'styles/global/animations.scss';
 import 'styles/global/misc.scss';
+import 'styles/global/typography.scss';
 
 import '@madeinhaus/carousel/dist/index.css';
 import '@madeinhaus/nextjs-page-transition/dist/index.css';
+
+import cx from 'clsx';
 
 import NextHead from 'next/head';
 import Header from 'components/ui/Header';
@@ -41,7 +44,7 @@ function App({ Component, pageProps }) {
             <Head />
             <PageTransitionContext>
                 <Header />
-                <PageTransition className={styles.main}>
+                <PageTransition className={cx(styles.main, 'body')}>
                     <Component {...pageProps} key={key} />
                 </PageTransition>
                 <GridOverlay />

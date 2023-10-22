@@ -1,8 +1,6 @@
 import * as React from 'react';
 import cx from 'clsx';
 
-import Text from 'components/ui/Text';
-
 import {
     Link,
     usePageTransitionState,
@@ -16,15 +14,15 @@ const Header = ({ className }) => {
     return (
         <div className={cx(styles.root, className)}>
             <div className={cx(styles.container, grid.container)}>
-                <Text className={styles.home} as="h1">
+                <h1 className={cx(styles.home, 'body')}>
                     <Link href="/">HAUS Next.JS Starter</Link>
-                </Text>
-                <Text className={styles.phase}>
+                </h1>
+                <p className={cx(styles.phase, 'body')}>
                     <span className={styles.phasePrefix}>
                         PageTransitionPhase.
                     </span>
                     {phase}
-                </Text>
+                </p>
             </div>
         </div>
     );
