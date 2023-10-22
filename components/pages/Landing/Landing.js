@@ -29,9 +29,7 @@ const Landing = () => {
                 description="A skeleton Next.js app to quickly get started."
             />
             <section className={styles.section}>
-                <h2 className={cx(styles.sectionHeadline, 'body')}>
-                    Demos
-                </h2>
+                <h2 className={cx(styles.sectionHeadline, 'body')}>Demos</h2>
                 <ul className={styles.links}>
                     {demoLinks.map(({ href, label }, i) => (
                         <li key={i} className={styles.link}>
@@ -43,9 +41,7 @@ const Landing = () => {
                 </ul>
             </section>
             <section className={styles.section}>
-                <h2 className={cx(styles.sectionHeadline, 'body')}>
-                    Theme
-                </h2>
+                <h2 className={cx(styles.sectionHeadline, 'body')}>Theme</h2>
                 <ul>
                     {['auto', 'light', 'dark'].map(themeValue => (
                         <li key={themeValue}>
@@ -61,15 +57,11 @@ const Landing = () => {
                 </ul>
             </section>
             <section className={styles.section}>
-                <h2 className={cx(styles.sectionHeadline, 'body')}>
-                    Source
-                </h2>
+                <h2 className={cx(styles.sectionHeadline, 'body')}>Source</h2>
                 <ul>
                     <li className={styles.link}>
                         <Link href="https://github.com/MadeInHaus/next-starter">
-                            <span>
-                                https://github.com/MadeInHaus/next-starter
-                            </span>
+                            <span>https://github.com/MadeInHaus/next-starter</span>
                         </Link>
                     </li>
                 </ul>

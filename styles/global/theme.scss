@@ -23,5 +23,7 @@
 body {
     color: var(--text-color);
     background-color: var(--background-color);
-    transition: color 0.15s linear, background-color 0.15s linear;
+    transition:
+        color 0.15s linear,
+        background-color 0.15s linear;
 }

@@ -15,41 +15,37 @@ const run = async () => {
     const yarnLockPath = path.resolve(process.cwd(), 'yarn.lock');
     const hasYarnLock = sh.test('-f', yarnLockPath);
 
-    const {
-        removeDotNext,
-        removeNodeModules,
-        removePackageLock,
-        removeYarnLock,
-    } = await inquirer.prompt([
-        {
-            type: 'confirm',
-            name: 'removeDotNext',
-            message: `Remove .next folder?`,
-            when: hasDotNext,
-            default: true,
-        },
-        {
-            type: 'confirm',
-            name: 'removeNodeModules',
-            message: `Remove node_modules folder?`,
-            when: hasNodeModules,
-            default: true,
-        },
-        {
-            type: 'confirm',
-            name: 'removePackageLock',
-            message: `Remove package-lock.json file?`,
-            when: hasPackageLock,
-            default: true,
-        },
-        {
-            type: 'confirm',
-            name: 'removeYarnLock',
-            message: `Remove yarn.lock file?`,
-            when: hasYarnLock,
-            default: true,
-        },
-    ]);
+    const { removeDotNext, removeNodeModules, removePackageLock, removeYarnLock } =
+        await inquirer.prompt([
+            {
+                type: 'confirm',
+                name: 'removeDotNext',
+                message: `Remove .next folder?`,
+                when: hasDotNext,
+                default: true,
+            },
+            {
+                type: 'confirm',
+                name: 'removeNodeModules',
+                message: `Remove node_modules folder?`,
+                when: hasNodeModules,
+                default: true,
+            },
+            {
+                type: 'confirm',
+                name: 'removePackageLock',
+                message: `Remove package-lock.json file?`,
+                when: hasPackageLock,
+                default: true,
+            },
+            {
+                type: 'confirm',
+                name: 'removeYarnLock',
+                message: `Remove yarn.lock file?`,
+                when: hasYarnLock,
+                default: true,
+            },
+        ]);
 
     if (
         (!hasDotNext || !removeDotNext) &&

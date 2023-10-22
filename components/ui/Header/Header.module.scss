@@ -8,7 +8,9 @@
     height: var(--header-height);
     border-bottom: 1px solid var(--border-color-1);
     background-color: var(--surface-color-1);
-    transition: border-bottom 0.15s linear, background-color 0.15s linear;
+    transition:
+        border-bottom 0.15s linear,
+        background-color 0.15s linear;
     z-index: 1;
 }
 

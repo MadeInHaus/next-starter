@@ -1,10 +1,7 @@
 import * as React from 'react';
 import cx from 'clsx';
 
-import {
-    Link,
-    usePageTransitionState,
-} from '@madeinhaus/nextjs-page-transition';
+import { Link, usePageTransitionState } from '@madeinhaus/nextjs-page-transition';
 
 import grid from 'styles/modules/grid.module.scss';
 import styles from './Header.module.scss';
@@ -18,9 +15,7 @@ const Header = ({ className }) => {
                     <Link href="/">HAUS Next.JS Starter</Link>
                 </h1>
                 <p className={cx(styles.phase, 'body')}>
-                    <span className={styles.phasePrefix}>
-                        PageTransitionPhase.
-                    </span>
+                    <span className={styles.phasePrefix}>PageTransitionPhase.</span>
                     {phase}
                 </p>
             </div>

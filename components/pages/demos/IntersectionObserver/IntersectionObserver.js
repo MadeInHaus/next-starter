@@ -22,17 +22,8 @@ const IntersectionObserver = () => {
                 <p>{`once: ${once ? 'ON' : 'OFF'}`}</p>
                 <p>{`inView: ${inView ? 'YES' : 'NO'}`}</p>
             </div>
-            <div
-                className={cx(
-                    styles.intersectingElementContainer,
-                    grid.container
-                )}
-            >
-                <div
-                    ref={ref}
-                    id="anchor"
-                    className={styles.intersectingElement}
-                />
+            <div className={cx(styles.intersectingElementContainer, grid.container)}>
+                <div ref={ref} id="anchor" className={styles.intersectingElement} />
             </div>
         </div>
     );

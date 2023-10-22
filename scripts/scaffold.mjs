@@ -5,11 +5,7 @@ import sh from 'shelljs';
 import path from 'path';
 import fs from 'fs';
 
-import {
-    uiComponentJS,
-    uiComponentSCSS,
-    uiComponentIndex,
-} from './templates/ui-component.mjs';
+import { uiComponentJS, uiComponentSCSS, uiComponentIndex } from './templates/ui-component.mjs';
 
 import {
     pageComponentRoute,
@@ -27,8 +23,7 @@ const uiComponentScaffold = async () => {
             name: 'name',
             message: 'Name:',
             validate: name =>
-                !!name.match(/^[A-Z][A-Za-z0-9]*$/) ||
-                'Component name must be in CamelCase',
+                !!name.match(/^[A-Z][A-Za-z0-9]*$/) || 'Component name must be in CamelCase',
         },
     ]);
     const dir = path.resolve(process.cwd(), 'components', 'ui', name);
@@ -80,8 +75,7 @@ const pageComponentScaffold = async () => {
             name: 'name',
             message: 'Name:',
             validate: name =>
-                !!name.match(/^[A-Z][A-Za-z0-9]*$/) ||
-                'Component name must be CamelCased',
+                !!name.match(/^[A-Z][A-Za-z0-9]*$/) || 'Component name must be CamelCased',
         },
     ]);
     const routeFile = route.match(/\.js$/) ? route : `${route}.js`;

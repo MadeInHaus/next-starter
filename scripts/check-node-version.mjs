@@ -11,9 +11,7 @@ const pkg = loadPackageJson(fileName);
 const requiredNodeVersion = pkg?.engines?.node;
 
 if (!pkg) {
-    console.warn(
-        chalk.yellow.bold(`\nUnable to load package.json at ${fileName}\n`)
-    );
+    console.warn(chalk.yellow.bold(`\nUnable to load package.json at ${fileName}\n`));
 } else if (!requiredNodeVersion) {
     console.warn(
         chalk.yellow.bold(
@@ -29,9 +27,7 @@ if (!pkg) {
     // Exit the process with a non-zero code to indicate failure
     process.exit(1);
 } else {
-    console.log(
-        chalk.green.bold(`\nNode version ${process.version} is compatible 👍\n`)
-    );
+    console.log(chalk.green.bold(`\nNode version ${process.version} is compatible 👍\n`));
 }
 
 function loadPackageJson(fileName) {
