@@ -13,7 +13,6 @@
         "color-no-hex": null,
         "color-no-invalid-hex": true,
         "custom-property-pattern": null,
-        "declaration-colon-newline-after": null,
         "font-family-name-quotes": "always-unless-keyword",
         "keyframes-name-pattern": null,
         "no-descending-specificity": null,
@@ -28,7 +27,6 @@
         "scss/operator-no-unspaced": null,
         "scss/percent-placeholder-pattern": null,
         "selector-class-pattern": null,
-        "value-list-comma-newline-after": null,
         "comment-empty-line-before": [
             "always",
             {
