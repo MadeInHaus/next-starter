@@ -4,7 +4,7 @@
   "version": "1.1.0",
   "author": "Haus",
   "engines": {
-    "node": "^18"
+    "node": "^20"
   },
   "scripts": {
     "preinstall": "node scripts/check-node-version.mjs",
