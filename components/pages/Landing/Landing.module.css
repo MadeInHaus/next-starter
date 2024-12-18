@@ -33,7 +33,7 @@
         padding-top: 0;
     }
 
-    > a {
+    & > a {
         text-decoration-color: #888;
         text-underline-offset: 0.4rem;
     }

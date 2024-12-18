@@ -3,12 +3,11 @@ import cx from 'clsx';
 
 import { useIntersectionObserver, useImagePreload } from '@madeinhaus/hooks';
 
-import grid from 'styles/modules/grid.module.scss';
-import styles from './ImageLoader.module.scss';
+import styles from './ImageLoader.module.css';
 
 const ImageLoader = ({ dogs }) => {
     return (
-        <div className={cx(styles.root, grid.container)}>
+        <div className={cx(styles.root, 'grid')}>
             <div className={styles.dogs}>
                 {dogs.map((dog, i) => (
                     <LazyImage key={i} url={dog} />

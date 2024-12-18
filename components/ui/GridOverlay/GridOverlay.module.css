@@ -1,5 +1,3 @@
-@import 'styles/breakpoints';
-
 .gridOverlay {
     position: fixed;
     top: 0;
@@ -78,7 +76,7 @@
     display: block;
 }
 
-@include large {
+@media (width >= 1280px) {
     .col7,
     .col8,
     .col9,

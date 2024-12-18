@@ -4,8 +4,7 @@ import { useTheme } from '@madeinhaus/nextjs-theme';
 import { Link } from '@madeinhaus/nextjs-page-transition';
 import Head from 'components/misc/Head';
 
-import grid from 'styles/modules/grid.module.scss';
-import styles from './Landing.module.scss';
+import styles from './Landing.module.css';
 
 // prettier-ignore
 const demoLinks = [
@@ -23,7 +22,7 @@ const Landing = () => {
     };
 
     return (
-        <div className={cx(styles.root, grid.container)}>
+        <div className={cx(styles.root, 'grid')}>
             <Head
                 title="HAUS Next.js Starter"
                 description="A skeleton Next.js app to quickly get started."

@@ -5,12 +5,12 @@ import sh from 'shelljs';
 import path from 'path';
 import fs from 'fs';
 
-import { uiComponentJS, uiComponentSCSS, uiComponentIndex } from './templates/ui-component.mjs';
+import { uiComponentJS, uiComponentCSS, uiComponentIndex } from './templates/ui-component.mjs';
 
 import {
     pageComponentRoute,
     pageComponentJS,
-    pageComponentSCSS,
+    pageComponentCSS,
     pageComponentIndex,
 } from './templates/page-component.mjs';
 
@@ -44,18 +44,18 @@ const uiComponentScaffold = async () => {
     sh.mkdir('-p', dir);
 
     const js = new sh.ShellString(uiComponentJS(name));
-    const scss = new sh.ShellString(uiComponentSCSS());
+    const css = new sh.ShellString(uiComponentCSS());
     const index = new sh.ShellString(uiComponentIndex(name));
 
     js.to(path.resolve(dir, `${name}.js`));
-    scss.to(path.resolve(dir, `${name}.module.scss`));
+    css.to(path.resolve(dir, `${name}.module.css`));
     index.to(path.resolve(dir, `index.js`));
 
     const check = chalk.green.bold('✓');
     console.log('\nFiles written:');
     console.log(`- components/ui/${name}/index.js ${check}`);
     console.log(`- components/ui/${name}/${name}.js ${check}`);
-    console.log(`- components/ui/${name}/${name}.module.scss ${check}\n`);
+    console.log(`- components/ui/${name}/${name}.module.css ${check}\n`);
 };
 
 const pageComponentScaffold = async () => {
@@ -119,11 +119,11 @@ const pageComponentScaffold = async () => {
     fs.writeFileSync(routePath, pageComponentRoute(name));
 
     const js = new sh.ShellString(pageComponentJS(name));
-    const scss = new sh.ShellString(pageComponentSCSS());
+    const css = new sh.ShellString(pageComponentCSS());
     const index = new sh.ShellString(pageComponentIndex(name));
 
     js.to(path.resolve(compDir, `${name}.js`));
-    scss.to(path.resolve(compDir, `${name}.module.scss`));
+    css.to(path.resolve(compDir, `${name}.module.css`));
     index.to(path.resolve(compDir, `index.js`));
 
     const check = chalk.green.bold('✓');
@@ -131,7 +131,7 @@ const pageComponentScaffold = async () => {
     console.log(`- pages/${routeFile} ${check}`);
     console.log(`- components/pages/${name}/index.js ${check}`);
     console.log(`- components/pages/${name}/${name}.js ${check}`);
-    console.log(`- components/pages/${name}/${name}.module.scss ${check}\n`);
+    console.log(`- components/pages/${name}/${name}.module.css ${check}\n`);
 };
 
 const run = async () => {

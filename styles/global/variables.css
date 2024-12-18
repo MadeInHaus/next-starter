@@ -1,7 +1,5 @@
-// Timing fns
-// --------------------------
-
 :root {
+    /* Timing functions */
     --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
     --ease-in: cubic-bezier(0.42, 0, 1, 1);
     --ease-in-circ: cubic-bezier(0.6, 0.04, 0.98, 0.335);
@@ -28,4 +26,20 @@
     --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
     --ease-linear: cubic-bezier(0.25, 0.25, 0.75, 0.75);
+
+    /* Colors */
+    --black: #0a0a0a;
+    --white: #fff;
+    --gray: #c7c7c7;
+    --lightGray: #f6f6f6;
+    --darkGray: #777;
+
+    /* Misc */
+    --header-height: 60px;
+}
+
+@media (width >= 1280px) {
+    :root {
+        --header-height: 80px;
+    }
 }

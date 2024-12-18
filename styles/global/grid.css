@@ -1,5 +1,3 @@
-@import 'styles/breakpoints';
-
 :root {
     --grid-margin: 20px;
     --grid-gap: 10px;
@@ -11,21 +9,31 @@
     --grid-col-width: calc(var(--grid-cols-width) / var(--grid-columns));
 }
 
-@include medium {
+@media (width >= 768px) {
     :root {
         --grid-margin: 50px;
         --grid-gap: 20px;
     }
 }
 
-@include large {
+@media (width >= 1280px) {
     :root {
         --grid-columns: 12;
     }
 }
 
-@include xlarge {
+@media (width >= 1920px) {
     :root {
         --grid-margin: 100px;
     }
+}
+
+.grid {
+    display: grid;
+    width: calc(100% - var(--grid-margin) * 2) !important;
+    margin-left: var(--grid-margin) !important;
+    margin-right: var(--grid-margin) !important;
+    grid-gap: 0 var(--grid-gap);
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    grid-template-rows: auto;
 }

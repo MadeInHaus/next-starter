@@ -3,7 +3,7 @@ import cx from 'clsx';
 import Carousel from '@madeinhaus/carousel';
 import { useIntersectionObserver, useImagePreload } from '@madeinhaus/hooks';
 
-import styles from './Carousel.module.scss';
+import styles from './Carousel.module.css';
 
 const CarouselDemo = ({ dogs }) => {
     return (

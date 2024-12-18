@@ -1,5 +1,3 @@
-@import 'styles/breakpoints';
-
 .root {
     position: fixed;
     top: 0;
@@ -35,13 +33,13 @@
     display: none;
 }
 
-@include medium {
+@media (width >= 768px) {
     .phasePrefix {
         display: inline;
     }
 }
 
-@include large {
+@media (width >= 1280px) {
     .home {
         grid-column: 1 / span 6;
     }

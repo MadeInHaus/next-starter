@@ -1,7 +1,7 @@
 {
   "name": "next-starter",
   "description": "A skeleton Next.js app to quickly get started.",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "author": "Haus",
   "engines": {
     "node": "^20"
@@ -16,7 +16,7 @@
     "scaffold": "node scripts/scaffold.mjs",
     "prettier": "prettier -c .",
     "prettier-fix": "prettier -w .",
-    "stylelint": "stylelint \"**/*.scss\"",
+    "stylelint": "stylelint \"**/*.css\"",
     "stylelint-fix": "stylelint --fix \"**/*.css\""
   },
   "dependencies": {
@@ -30,9 +30,6 @@
     "next": "15.1.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "sass": "1.83.0",
-    "stylelint-config-standard-scss": "^14.0.0",
-    "stylelint-css-modules": "^1.2.2",
     "zustand": "5.0.2"
   },
   "devDependencies": {
@@ -45,6 +42,8 @@
     "prettier": "3.4.2",
     "semver": "^7.6.3",
     "shelljs": "0.8.5",
-    "stylelint": "16.12.0"
+    "stylelint": "16.12.0",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-css-modules": "^1.2.2"
   }
 }

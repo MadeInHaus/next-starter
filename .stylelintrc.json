@@ -1,7 +1,6 @@
 {
-    "extends": ["stylelint-config-standard-scss", "stylelint-css-modules"],
+    "extends": ["stylelint-config-standard", "stylelint-css-modules"],
     "rules": {
-        "scss/double-slash-comment-empty-line-before": null,
         "at-rule-empty-line-before": null,
         "declaration-empty-line-before": null,
         "custom-property-empty-line-before": null,
@@ -17,22 +16,7 @@
         "keyframes-name-pattern": null,
         "no-descending-specificity": null,
         "max-nesting-depth": 3,
-        "scss/at-extend-no-missing-placeholder": null,
-        "scss/at-import-partial-extension": null,
-        "scss/at-mixin-pattern": null,
-        "scss/dollar-variable-pattern": null,
-        "scss/double-slash-comment-whitespace-inside": null,
-        "scss/no-global-function-names": null,
-        "scss/operator-no-newline-after": null,
-        "scss/operator-no-unspaced": null,
-        "scss/percent-placeholder-pattern": null,
         "selector-class-pattern": null,
-        "comment-empty-line-before": [
-            "always",
-            {
-                "ignore": ["stylelint-commands", "after-comment"]
-            }
-        ],
         "rule-empty-line-before": [
             "always",
             {
@@ -40,28 +24,10 @@
                 "ignore": ["after-comment"]
             }
         ],
-        "property-no-unknown": [
-            true,
-            {
-                "ignoreProperties": [
-                    "composes",
-                    "linear",
-                    "/ease/",
-                    "/fast/",
-                    "/slow/",
-                    "/duration/",
-                    "/width/",
-                    "/thickness/",
-                    "/desktop/",
-                    "/tablet/",
-                    "/default/"
-                ]
-            }
-        ],
         "selector-pseudo-class-no-unknown": [
             true,
             {
-                "ignorePseudoClasses": ["export", "import", "global", "local"]
+                "ignorePseudoClasses": ["global", "local"]
             }
         ]
     }

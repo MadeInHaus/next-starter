@@ -13,7 +13,7 @@ const PageHead = ({ title, description, image, url, preloads }) => {
             <meta key="og-type" property="og:type" content="website" />
             <meta key="tw-card" name="twitter:card" content="summary_large_image" />
             <meta key="tw-creator" name="twitter:creator" content="@madeinhaus" />
-            {preloads.map(preload => {
+            {preloads?.map(preload => {
                 const props = {
                     rel: "preload",
                     as: "image",
